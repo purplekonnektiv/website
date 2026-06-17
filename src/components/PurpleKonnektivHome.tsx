@@ -6,8 +6,11 @@ import {
   FileText,
   Image as ImageIcon,
   MapPin,
+  Monitor,
+  Moon,
   Radio,
   Sparkles,
+  Sun,
   Users,
   Wifi,
 } from 'lucide-react';
@@ -20,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthor } from '@/hooks/useAuthor';
 import { usePurpleKonnektivCalendar, usePurpleKonnektivFeed } from '@/hooks/usePurpleKonnektivEvents';
+import { useTheme } from '@/hooks/useTheme';
 import {
   type CalendarEventView,
   extractImageUrls,
@@ -56,13 +60,13 @@ export function PurpleKonnektivHome() {
   const pastEvents = calendarEvents.filter((event) => event.isPast).slice(0, 3);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#f7f2ff] text-[#151019] selection:bg-[#e879f9] selection:text-[#241232]">
+    <div className="min-h-screen overflow-hidden bg-[#f7f2ff] text-[#151019] selection:bg-[#e879f9] selection:text-[#241232] dark:bg-[#151019] dark:text-[#fffdf7] dark:selection:bg-[#a855f7] dark:selection:text-[#fffdf7]">
       <SiteNav />
       <Ticker />
 
       <main>
-        <section className="relative isolate border-b-2 border-[#241232]">
-          <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(36,18,50,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(36,18,50,0.08)_1px,transparent_1px)] bg-[size:28px_28px]" />
+        <section className="relative isolate border-b-2 border-[#241232] dark:border-[#a855f7]">
+          <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(36,18,50,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(36,18,50,0.08)_1px,transparent_1px)] bg-[size:28px_28px] dark:bg-[linear-gradient(rgba(168,85,247,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.18)_1px,transparent_1px)]" />
           <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:py-24">
             <div className="space-y-8">
               <div className="flex flex-wrap gap-2">
@@ -76,11 +80,11 @@ export function PurpleKonnektivHome() {
               </div>
 
               <div className="space-y-5">
-                <h1 className="max-w-5xl font-black uppercase leading-[0.86] tracking-normal text-[#241232] text-[3.25rem] sm:text-[6rem] lg:text-[8.5rem]">
+                <h1 className="max-w-5xl font-black uppercase leading-[0.86] tracking-normal text-[#241232] text-[3.25rem] dark:text-[#fffdf7] sm:text-[6rem] lg:text-[8.5rem]">
                   Purple
                   <span className="block text-[#6d28d9]">Konnektiv</span>
                 </h1>
-                <p className="max-w-3xl text-xl font-semibold leading-8 text-[#3b234f] sm:text-2xl sm:leading-9">
+                <p className="max-w-3xl text-xl font-semibold leading-8 text-[#3b234f] dark:text-[#d8c4ea] sm:text-2xl sm:leading-9">
                   A Nostr-native signal for humans who think decentralized social media and open information protocols matter.
                 </p>
               </div>
@@ -116,15 +120,15 @@ export function PurpleKonnektivHome() {
           </div>
         </section>
 
-        <section id="mission" className="border-b-2 border-[#241232] bg-[#fffdf7]">
+        <section id="mission" className="border-b-2 border-[#241232] bg-[#fffdf7] dark:border-[#a855f7] dark:bg-[#1c1027]">
           <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-8 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Mission</p>
-              <h2 className="mt-3 max-w-md text-4xl font-black leading-none text-[#241232] sm:text-5xl">
+              <h2 className="mt-3 max-w-md text-4xl font-black leading-none text-[#241232] dark:text-[#fffdf7] sm:text-5xl">
                 Relays over platforms. People over feeds.
               </h2>
             </div>
-            <div className="grid gap-5 text-lg leading-8 text-[#3b234f]">
+            <div className="grid gap-5 text-lg leading-8 text-[#3b234f] dark:text-[#d8c4ea]">
               <p>
                 PurpleKonnektiv is a collective space for decentralization-minded people to meet, publish, and coordinate through Nostr. The website does not own the conversation; it surfaces the shared signal.
               </p>
@@ -137,7 +141,7 @@ export function PurpleKonnektivHome() {
           </div>
         </section>
 
-        <section id="feed" className="border-b-2 border-[#241232] bg-[#241232] text-[#fffdf7]">
+        <section id="feed" className="border-b-2 border-[#241232] bg-[#241232] text-[#fffdf7] dark:border-[#a855f7] dark:bg-[#0f0a14]">
           <SectionHeader
             eyebrow="Live feed"
             title="Posts tagged #purplekonnektiv"
@@ -161,7 +165,7 @@ export function PurpleKonnektivHome() {
           </div>
         </section>
 
-        <section id="calendar" className="border-b-2 border-[#241232] bg-[#f7f2ff]">
+        <section id="calendar" className="border-b-2 border-[#241232] bg-[#f7f2ff] dark:border-[#a855f7] dark:bg-[#151019]">
           <SectionHeader
             eyebrow="Calendar"
             title="NIP-52 PurpleKonnektiv events"
@@ -181,7 +185,7 @@ export function PurpleKonnektivHome() {
                     <CalendarCard key={event.id} calendarEvent={event} />
                   ))}
                 </div>
-                <aside className="border-2 border-[#241232] bg-[#fffdf7] p-5 shadow-[6px_6px_0_#f7c948]">
+                <aside className="border-2 border-[#241232] bg-[#fffdf7] p-5 shadow-[6px_6px_0_#f7c948] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[6px_6px_0_#6d28d9]">
                   <h3 className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Past signal</h3>
                   <div className="mt-5 grid gap-4">
                     {pastEvents.length === 0 ? (
@@ -199,11 +203,11 @@ export function PurpleKonnektivHome() {
           </div>
         </section>
 
-        <section id="docs" className="bg-[#fffdf7]">
+        <section id="docs" className="bg-[#fffdf7] dark:bg-[#1c1027]">
           <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Docs</p>
-              <h2 className="mt-3 text-4xl font-black leading-none text-[#241232] sm:text-5xl">Document the protocol surface.</h2>
+              <h2 className="mt-3 text-4xl font-black leading-none text-[#241232] dark:text-[#fffdf7] sm:text-5xl">Document the protocol surface.</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
               <DocCard title="Design system" text="Colors, typography, spacing, and component rules live in docs." />
@@ -214,7 +218,7 @@ export function PurpleKonnektivHome() {
         </section>
       </main>
 
-      <footer className="border-t-2 border-[#241232] bg-[#241232] px-5 py-8 text-[#fffdf7] sm:px-8">
+      <footer className="border-t-2 border-[#241232] bg-[#241232] px-5 py-8 text-[#fffdf7] dark:border-[#a855f7] dark:bg-[#0f0a14] sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p className="font-mono font-bold">PurpleKonnektiv</p>
           <p className="text-[#d8c4ea]">Posts and events from Nostr relays via #purplekonnektiv.</p>
@@ -226,21 +230,45 @@ export function PurpleKonnektivHome() {
 
 function SiteNav() {
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-[#241232] bg-[#fffdf7]/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b-2 border-[#241232] bg-[#fffdf7]/95 backdrop-blur dark:border-[#a855f7] dark:bg-[#151019]/95">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8" aria-label="Primary">
-        <a href="#top" className="font-mono text-lg font-black uppercase text-[#241232] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9]">
+        <a href="#top" className="font-mono text-lg font-black uppercase text-[#241232] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9] dark:text-[#fffdf7]">
           PurpleKonnektiv
         </a>
         <div className="hidden items-center gap-5 md:flex">
           {navItems.map((item) => (
-            <a key={item.href} href={item.href} className="text-sm font-bold text-[#3b234f] underline-offset-4 hover:text-[#6d28d9] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9]">
+            <a key={item.href} href={item.href} className="text-sm font-bold text-[#3b234f] underline-offset-4 hover:text-[#6d28d9] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9] dark:text-[#d8c4ea] dark:hover:text-[#e879f9]">
               {item.label}
             </a>
           ))}
         </div>
-        <LoginArea className="max-w-48" />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <LoginArea className="max-w-48" />
+        </div>
       </nav>
     </header>
+  );
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const nextTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+  const Icon = theme === 'dark' ? Moon : theme === 'system' ? Monitor : Sun;
+  const label = `Theme: ${theme}. Switch to ${nextTheme}.`;
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="icon"
+      aria-label={label}
+      title={label}
+      onClick={() => setTheme(nextTheme)}
+      className="size-10 shrink-0 rounded-[4px] border-2 border-[#241232] bg-[#fffdf7] text-[#241232] shadow-[3px_3px_0_#a855f7] hover:bg-[#f7f2ff] dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[3px_3px_0_#6d28d9] dark:hover:bg-[#30183f]"
+    >
+      <Icon className="size-4" />
+    </Button>
   );
 }
 
@@ -248,7 +276,7 @@ function Ticker() {
   const repeatedItems = [...tickerItems, ...tickerItems];
 
   return (
-    <div className="overflow-hidden border-b-2 border-[#241232] bg-[#6d28d9] py-2 text-[#fffdf7]">
+    <div className="overflow-hidden border-b-2 border-[#241232] bg-[#6d28d9] py-2 text-[#fffdf7] dark:border-[#a855f7] dark:bg-[#241232]">
       <div className="motion-safe:animate-purple-ticker flex w-max gap-6 font-mono text-sm font-bold uppercase">
         {repeatedItems.map((item, index) => (
           <span key={`${item}-${index}`} className="flex items-center gap-6">
