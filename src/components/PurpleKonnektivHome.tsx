@@ -149,7 +149,7 @@ export function PurpleKonnektivHome() {
             ) : (
               <div className="grid gap-5 lg:grid-cols-3">
                 {feedEvents.map((event) => (
-                  <FeedCard key={event.id} event={event} />
+                  <FeedCard key={event.id} event={event} textMode="preview" />
                 ))}
               </div>
             )}
@@ -309,7 +309,7 @@ function SectionHeader({ eyebrow, title, description, inverted = false }: { eyeb
   );
 }
 
-export function FeedCard({ event }: { event: NostrEvent }) {
+export function FeedCard({ event, textMode = 'full' }: { event: NostrEvent; textMode?: 'full' | 'preview' }) {
   const author = useAuthor(event.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = metadata?.display_name ?? metadata?.name ?? shortPubkey(event.pubkey);
@@ -333,7 +333,7 @@ export function FeedCard({ event }: { event: NostrEvent }) {
         </div>
       </CardHeader>
       <CardContent className="min-w-0 space-y-4 p-4">
-        {text ? <FeedText content={text} /> : null}
+        {text ? <FeedText content={text} mode={textMode} /> : null}
         {imageUrls.length > 0 ? (
           <div className="grid min-w-0 gap-2">
             {imageUrls.map((url) => (
@@ -351,11 +351,14 @@ export function FeedCard({ event }: { event: NostrEvent }) {
   );
 }
 
-function FeedText({ content }: { content: string }) {
+function FeedText({ content, mode }: { content: string; mode: 'full' | 'preview' }) {
   const segments = splitNostrMentions(content);
 
   return (
-    <p className="whitespace-pre-wrap break-words text-base leading-7 text-[#241232] [overflow-wrap:anywhere] dark:text-[#fffdf7]">
+    <p className={cn(
+      'whitespace-pre-wrap break-words text-base leading-7 text-[#241232] [overflow-wrap:anywhere] dark:text-[#fffdf7]',
+      mode === 'preview' && 'line-clamp-8',
+    )}>
       {segments.map((segment, index) => (
         segment.type === 'profile'
           ? <ProfileMention key={`${segment.value}-${index}`} identifier={segment.value} />
