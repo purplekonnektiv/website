@@ -5,15 +5,34 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { normalizeCalendarEvent, type CalendarEventView } from '@/lib/nostrContent';
 
 const PURPLE_TAG = 'purplekonnektiv';
+const PURPLE_KONNEKTIV_PUBKEY = '0f061fe4993a043142052cc4004f3b5a7c8398d2384b47cec4b4e7c00898e5e8';
 
-export function usePurpleKonnektivFeed() {
+export function usePurpleKonnektivFeed(limit = 9) {
   const { nostr } = useNostr();
 
   return useQuery<NostrEvent[]>({
-    queryKey: ['nostr', 'purplekonnektiv', 'feed'],
+    queryKey: ['nostr', 'purplekonnektiv', 'feed', limit],
     queryFn: async (context) => {
       const events = await nostr.query(
-        [{ kinds: [1, 20], '#t': [PURPLE_TAG], limit: 30 }],
+        [{ kinds: [1, 20], '#t': [PURPLE_TAG], limit }],
+        { signal: context.signal },
+      );
+
+      return events
+        .filter((event) => event.kind === 1 || event.kind === 20)
+        .sort((a, b) => b.created_at - a.created_at);
+    },
+  });
+}
+
+export function usePurpleKonnektivAccountFeed(limit = 9) {
+  const { nostr } = useNostr();
+
+  return useQuery<NostrEvent[]>({
+    queryKey: ['nostr', 'purplekonnektiv', 'account-feed', limit],
+    queryFn: async (context) => {
+      const events = await nostr.query(
+        [{ kinds: [1, 20], authors: [PURPLE_KONNEKTIV_PUBKEY], limit }],
         { signal: context.signal },
       );
 
