@@ -36,7 +36,7 @@ import {
 } from '@/lib/nostrContent';
 import { cn } from '@/lib/utils';
 
-const NOSTR_PROFILE_PATTERN = /(?:nostr:)?((?:npub|nprofile)1[023456789acdefghjklmnpqrstuvwxyz]+)/g;
+const NOSTR_REFERENCE_PATTERN = /(?:nostr:)?((?:npub|nprofile|note|nevent|naddr)1[023456789acdefghjklmnpqrstuvwxyz]+)/g;
 
 const tickerItems = [
   '#purplekonnektiv',
@@ -366,7 +366,7 @@ export function FeedCard({ event, textMode = 'full', linkToPost = true }: { even
 }
 
 function FeedText({ content, mode }: { content: string; mode: 'full' | 'preview' }) {
-  const segments = splitNostrMentions(content);
+  const segments = splitNostrReferences(content);
 
   return (
     <p className={cn(
@@ -374,9 +374,13 @@ function FeedText({ content, mode }: { content: string; mode: 'full' | 'preview'
       mode === 'preview' && 'line-clamp-8',
     )}>
       {segments.map((segment, index) => (
-        segment.type === 'profile'
-          ? <ProfileMention key={`${segment.value}-${index}`} identifier={segment.value} />
-          : <span key={`${segment.value}-${index}`}>{segment.value}</span>
+        segment.type === 'text' ? (
+          <span key={`${segment.value}-${index}`}>{segment.value}</span>
+        ) : segment.type === 'profile' ? (
+          <ProfileMention key={`${segment.value}-${index}`} identifier={segment.value} />
+        ) : (
+          <EventReference key={`${segment.value}-${index}`} identifier={segment.value} />
+        )
       ))}
     </p>
   );
@@ -395,17 +399,35 @@ function ProfileMention({ identifier }: { identifier: string }) {
   );
 }
 
-function splitNostrMentions(content: string): Array<{ type: 'text' | 'profile'; value: string }> {
-  const segments: Array<{ type: 'text' | 'profile'; value: string }> = [];
-  let lastIndex = 0;
-  let lastMentionPubkey: string | undefined;
+function EventReference({ identifier }: { identifier: string }) {
+  const reference = decodeEventIdentifier(identifier);
 
-  for (const match of content.matchAll(NOSTR_PROFILE_PATTERN)) {
+  return (
+    <span className="mx-1 inline-flex max-w-full items-center gap-1 rounded-[4px] border border-[#a855f7] bg-[#f7f2ff] px-2 py-0.5 align-baseline font-mono text-xs font-bold uppercase text-[#6d28d9] [overflow-wrap:anywhere] dark:bg-[#1c1027] dark:text-[#e879f9]">
+      <MessageCircle className="size-3 shrink-0" />
+      {reference}
+    </span>
+  );
+}
+
+type FeedTextSegment =
+  | { type: 'text'; value: string }
+  | { type: 'profile'; value: string }
+  | { type: 'event'; value: string };
+
+function splitNostrReferences(content: string): FeedTextSegment[] {
+  const segments: FeedTextSegment[] = [];
+  let lastIndex = 0;
+  let lastReferenceKey: string | undefined;
+
+  for (const match of content.matchAll(NOSTR_REFERENCE_PATTERN)) {
     const matchIndex = match.index ?? 0;
     const textBetween = content.slice(lastIndex, matchIndex);
-    const pubkey = decodeProfileIdentifier(match[1]);
+    const identifier = match[1];
+    const reference = decodeNostrReference(identifier);
+    const referenceKey = reference ? `${reference.type}:${reference.value}` : undefined;
 
-    if (pubkey && pubkey === lastMentionPubkey && textBetween.trim() === '') {
+    if (referenceKey && referenceKey === lastReferenceKey && textBetween.trim() === '') {
       lastIndex = matchIndex + match[0].length;
       continue;
     }
@@ -414,8 +436,13 @@ function splitNostrMentions(content: string): Array<{ type: 'text' | 'profile'; 
       segments.push({ type: 'text', value: textBetween });
     }
 
-    segments.push({ type: 'profile', value: match[1] });
-    lastMentionPubkey = pubkey;
+    if (reference) {
+      segments.push({ type: reference.type, value: identifier });
+    } else {
+      segments.push({ type: 'text', value: match[0] });
+    }
+
+    lastReferenceKey = referenceKey;
     lastIndex = matchIndex + match[0].length;
   }
 
@@ -424,6 +451,16 @@ function splitNostrMentions(content: string): Array<{ type: 'text' | 'profile'; 
   }
 
   return segments;
+}
+
+function decodeNostrReference(identifier: string): { type: 'profile' | 'event'; value: string } | undefined {
+  const profilePubkey = decodeProfileIdentifier(identifier);
+  if (profilePubkey) return { type: 'profile', value: profilePubkey };
+
+  const eventLabel = decodeEventIdentifier(identifier);
+  if (eventLabel) return { type: 'event', value: eventLabel };
+
+  return undefined;
 }
 
 function decodeProfileIdentifier(identifier: string): string | undefined {
@@ -435,6 +472,32 @@ function decodeProfileIdentifier(identifier: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+function decodeEventIdentifier(identifier: string): string | undefined {
+  try {
+    const decoded = nip19.decode(identifier);
+
+    if (decoded.type === 'note') {
+      return `post ${shortEventId(decoded.data)}`;
+    }
+
+    if (decoded.type === 'nevent') {
+      return `post ${shortEventId(decoded.data.id)}`;
+    }
+
+    if (decoded.type === 'naddr') {
+      return 'shared event';
+    }
+
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function shortEventId(id: string): string {
+  return `${id.slice(0, 6)}:${id.slice(-4)}`;
 }
 
 function CalendarMonth({ events }: { events: CalendarEventView[] }) {
