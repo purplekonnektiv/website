@@ -5,21 +5,54 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { normalizeCalendarEvent, type CalendarEventView } from '@/lib/nostrContent';
 
 const PURPLE_TAG = 'purplekonnektiv';
+const PURPLE_KONNEKTIV_PUBKEY = '0f061fe4993a043142052cc4004f3b5a7c8398d2384b47cec4b4e7c00898e5e8';
 
-export function usePurpleKonnektivFeed() {
+function isFeedEvent(event: NostrEvent): boolean {
+  return event.kind === 1 || event.kind === 20;
+}
+
+function uniqueNewestFeedEvents(events: NostrEvent[], limit: number): NostrEvent[] {
+  const eventsById = new Map<string, NostrEvent>();
+
+  for (const event of events) {
+    if (isFeedEvent(event)) {
+      eventsById.set(event.id, event);
+    }
+  }
+
+  return Array.from(eventsById.values())
+    .sort((a, b) => b.created_at - a.created_at)
+    .slice(0, limit);
+}
+
+export function usePurpleKonnektivFeed(limit = 9) {
   const { nostr } = useNostr();
 
   return useQuery<NostrEvent[]>({
-    queryKey: ['nostr', 'purplekonnektiv', 'feed'],
+    queryKey: ['nostr', 'purplekonnektiv', 'feed', limit],
     queryFn: async (context) => {
       const events = await nostr.query(
-        [{ kinds: [1, 20], '#t': [PURPLE_TAG], limit: 30 }],
+        [{ kinds: [1, 20], '#t': [PURPLE_TAG], limit }],
         { signal: context.signal },
       );
 
-      return events
-        .filter((event) => event.kind === 1 || event.kind === 20)
-        .sort((a, b) => b.created_at - a.created_at);
+      return uniqueNewestFeedEvents(events, limit);
+    },
+  });
+}
+
+export function usePurpleKonnektivAccountFeed(limit = 9) {
+  const { nostr } = useNostr();
+
+  return useQuery<NostrEvent[]>({
+    queryKey: ['nostr', 'purplekonnektiv', 'account-feed', limit],
+    queryFn: async (context) => {
+      const events = await nostr.query(
+        [{ kinds: [1, 20], authors: [PURPLE_KONNEKTIV_PUBKEY], limit }],
+        { signal: context.signal },
+      );
+
+      return uniqueNewestFeedEvents(events, limit);
     },
   });
 }
@@ -33,18 +66,24 @@ export function usePurpleKonnektivFeedPages(pageSize = 12) {
     queryFn: async ({ pageParam, signal }) => {
       const until = typeof pageParam === 'number' ? pageParam : undefined;
       const events = await nostr.query(
-        [{
-          kinds: [1, 20],
-          '#t': [PURPLE_TAG],
-          limit: pageSize,
-          ...(until ? { until } : {}),
-        }],
+        [
+          {
+            kinds: [1, 20],
+            '#t': [PURPLE_TAG],
+            limit: pageSize,
+            ...(until ? { until } : {}),
+          },
+          {
+            kinds: [1, 20],
+            authors: [PURPLE_KONNEKTIV_PUBKEY],
+            limit: pageSize,
+            ...(until ? { until } : {}),
+          },
+        ],
         { signal },
       );
 
-      return events
-        .filter((event) => event.kind === 1 || event.kind === 20)
-        .sort((a, b) => b.created_at - a.created_at);
+      return uniqueNewestFeedEvents(events, pageSize);
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.length < pageSize) return undefined;

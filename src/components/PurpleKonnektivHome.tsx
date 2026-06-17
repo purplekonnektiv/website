@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthor } from '@/hooks/useAuthor';
-import { usePurpleKonnektivCalendar, usePurpleKonnektivFeed } from '@/hooks/usePurpleKonnektivEvents';
+import { usePurpleKonnektivAccountFeed, usePurpleKonnektivCalendar, usePurpleKonnektivFeed } from '@/hooks/usePurpleKonnektivEvents';
 import { useTheme } from '@/hooks/useTheme';
 import {
   type CalendarEventView,
@@ -57,8 +57,10 @@ const navItems = [
 ];
 
 export function PurpleKonnektivHome() {
+  const accountFeed = usePurpleKonnektivAccountFeed(9);
   const feed = usePurpleKonnektivFeed();
   const calendar = usePurpleKonnektivCalendar();
+  const accountEvents = accountFeed.data ?? [];
   const feedEvents = feed.data ?? [];
   const calendarEvents = calendar.data ?? [];
   const upcomingEvents = calendarEvents.filter((event) => !event.isPast);
@@ -130,6 +132,29 @@ export function PurpleKonnektivHome() {
                 <MissionCard icon={Sparkles} title="Open" text="Use #purplekonnektiv for PurpleKonnektiv meetups, events, and follow-up notes." />
               </div>
             </div>
+          </div>
+        </section>
+
+        <section id="official-feed" className="border-b-2 border-[#241232] bg-[#fffdf7] dark:border-[#a855f7] dark:bg-[#1c1027]">
+          <SectionHeader
+            eyebrow="PurpleKonnektiv account"
+            title="Posts from PurpleKonnektiv"
+            description="Updates, announcements, and notes published directly by the PurpleKonnektiv account."
+          />
+          <div className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
+            {accountFeed.isLoading ? (
+              <FeedSkeleton />
+            ) : accountFeed.isError ? (
+              <StateCard title="The account feed needs a moment" text="Try refreshing, or check your connections if these posts do not appear." />
+            ) : accountEvents.length === 0 ? (
+              <StateCard title="No account posts yet" text="Posts from the PurpleKonnektiv account will appear here." />
+            ) : (
+              <div className="grid gap-5 lg:grid-cols-3">
+                {accountEvents.map((event) => (
+                  <FeedCard key={event.id} event={event} textMode="preview" />
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
