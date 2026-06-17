@@ -14,6 +14,7 @@ import {
   Sun,
   Users,
 } from 'lucide-react';
+import { nip19 } from 'nostr-tools';
 import { Link } from 'react-router-dom';
 
 import { LoginArea } from '@/components/auth/LoginArea';
@@ -34,6 +35,8 @@ import {
   stripImageUrls,
 } from '@/lib/nostrContent';
 import { cn } from '@/lib/utils';
+
+const NOSTR_NPUB_PATTERN = /nostr:(npub1[023456789acdefghjklmnpqrstuvwxyz]+)/g;
 
 const tickerItems = [
   '#purplekonnektiv',
@@ -330,7 +333,7 @@ export function FeedCard({ event }: { event: NostrEvent }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4 p-4">
-        {text ? <p className="whitespace-pre-wrap text-base leading-7 text-[#241232] dark:text-[#fffdf7]">{text}</p> : null}
+        {text ? <FeedText content={text} /> : null}
         {imageUrls.length > 0 ? (
           <div className="grid gap-2">
             {imageUrls.map((url) => (
@@ -346,6 +349,63 @@ export function FeedCard({ event }: { event: NostrEvent }) {
       </CardContent>
     </Card>
   );
+}
+
+function FeedText({ content }: { content: string }) {
+  const segments = splitNostrMentions(content);
+
+  return (
+    <p className="whitespace-pre-wrap break-words text-base leading-7 text-[#241232] [overflow-wrap:anywhere] dark:text-[#fffdf7]">
+      {segments.map((segment, index) => (
+        segment.type === 'npub'
+          ? <NpubMention key={`${segment.value}-${index}`} npub={segment.value} />
+          : <span key={`${segment.value}-${index}`}>{segment.value}</span>
+      ))}
+    </p>
+  );
+}
+
+function NpubMention({ npub }: { npub: string }) {
+  const pubkey = decodeNpub(npub);
+  const author = useAuthor(pubkey);
+  const metadata: NostrMetadata | undefined = author.data?.metadata;
+  const label = metadata?.display_name ?? metadata?.name ?? (pubkey ? shortPubkey(pubkey) : npub);
+
+  return (
+    <span className="inline font-bold text-[#6d28d9] [overflow-wrap:anywhere] dark:text-[#e879f9]">
+      @{label}
+    </span>
+  );
+}
+
+function splitNostrMentions(content: string): Array<{ type: 'text' | 'npub'; value: string }> {
+  const segments: Array<{ type: 'text' | 'npub'; value: string }> = [];
+  let lastIndex = 0;
+
+  for (const match of content.matchAll(NOSTR_NPUB_PATTERN)) {
+    const matchIndex = match.index ?? 0;
+    if (matchIndex > lastIndex) {
+      segments.push({ type: 'text', value: content.slice(lastIndex, matchIndex) });
+    }
+
+    segments.push({ type: 'npub', value: match[1] });
+    lastIndex = matchIndex + match[0].length;
+  }
+
+  if (lastIndex < content.length) {
+    segments.push({ type: 'text', value: content.slice(lastIndex) });
+  }
+
+  return segments;
+}
+
+function decodeNpub(npub: string): string | undefined {
+  try {
+    const decoded = nip19.decode(npub);
+    return decoded.type === 'npub' ? decoded.data : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function CalendarMonth({ events }: { events: CalendarEventView[] }) {
