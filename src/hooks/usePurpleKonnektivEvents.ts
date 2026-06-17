@@ -20,7 +20,8 @@ export function usePurpleKonnektivFeed(limit = 9) {
 
       return events
         .filter((event) => event.kind === 1 || event.kind === 20)
-        .sort((a, b) => b.created_at - a.created_at);
+        .sort((a, b) => b.created_at - a.created_at)
+        .slice(0, limit);
     },
   });
 }
@@ -38,7 +39,8 @@ export function usePurpleKonnektivAccountFeed(limit = 9) {
 
       return events
         .filter((event) => event.kind === 1 || event.kind === 20)
-        .sort((a, b) => b.created_at - a.created_at);
+        .sort((a, b) => b.created_at - a.created_at)
+        .slice(0, limit);
     },
   });
 }
