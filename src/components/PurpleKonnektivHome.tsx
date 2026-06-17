@@ -36,7 +36,7 @@ import {
 } from '@/lib/nostrContent';
 import { cn } from '@/lib/utils';
 
-const NOSTR_NPUB_PATTERN = /nostr:(npub1[023456789acdefghjklmnpqrstuvwxyz]+)/g;
+const NOSTR_NPUB_PATTERN = /(?:nostr:)?(npub1[023456789acdefghjklmnpqrstuvwxyz]+)/g;
 
 const tickerItems = [
   '#purplekonnektiv',
@@ -381,14 +381,24 @@ function NpubMention({ npub }: { npub: string }) {
 function splitNostrMentions(content: string): Array<{ type: 'text' | 'npub'; value: string }> {
   const segments: Array<{ type: 'text' | 'npub'; value: string }> = [];
   let lastIndex = 0;
+  let lastMentionPubkey: string | undefined;
 
   for (const match of content.matchAll(NOSTR_NPUB_PATTERN)) {
     const matchIndex = match.index ?? 0;
+    const textBetween = content.slice(lastIndex, matchIndex);
+    const pubkey = decodeNpub(match[1]);
+
+    if (pubkey && pubkey === lastMentionPubkey && textBetween.trim() === '') {
+      lastIndex = matchIndex + match[0].length;
+      continue;
+    }
+
     if (matchIndex > lastIndex) {
-      segments.push({ type: 'text', value: content.slice(lastIndex, matchIndex) });
+      segments.push({ type: 'text', value: textBetween });
     }
 
     segments.push({ type: 'npub', value: match[1] });
+    lastMentionPubkey = pubkey;
     lastIndex = matchIndex + match[0].length;
   }
 
