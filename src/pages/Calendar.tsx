@@ -1,20 +1,40 @@
-import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, MapPin } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, Loader2, MapPin, Plus } from 'lucide-react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
+import { useQueryClient } from '@tanstack/react-query';
 
+import { LoginArea } from '@/components/auth/LoginArea';
 import { StateCard } from '@/components/PurpleKonnektivHome';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useToast } from '@/hooks/useToast';
 import { usePurpleKonnektivCalendar } from '@/hooks/usePurpleKonnektivEvents';
-import type { CalendarEventView } from '@/lib/nostrContent';
+import { sanitizeUrl, type CalendarEventView } from '@/lib/nostrContent';
 import { cn } from '@/lib/utils';
 
 export default function Calendar() {
   const calendar = usePurpleKonnektivCalendar();
+  const { user } = useCurrentUser();
   const events = calendar.data ?? [];
   const firstEventDate = events.find((event) => !event.isPast)?.startDate ?? events[0]?.startDate ?? new Date();
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(firstEventDate.getFullYear(), firstEventDate.getMonth(), 1));
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useSeoMeta({
     title: 'Calendar - PurpleKonnektiv',
@@ -45,6 +65,16 @@ export default function Calendar() {
           <p className="mt-5 max-w-2xl text-lg leading-8 text-[#3b234f] dark:text-[#d8c4ea]">
             Meetups, calls, workshops, and local hangouts in a dedicated calendar view.
           </p>
+          <div className="mt-8">
+            <CreateEventDialog
+              open={createDialogOpen}
+              onOpenChange={setCreateDialogOpen}
+              onCreated={(date) => {
+                setVisibleMonth(new Date(date.getFullYear(), date.getMonth(), 1));
+              }}
+              isLoggedIn={Boolean(user)}
+            />
+          </div>
         </div>
       </section>
 
@@ -123,6 +153,218 @@ export default function Calendar() {
   );
 }
 
+function CreateEventDialog({
+  open,
+  onOpenChange,
+  onCreated,
+  isLoggedIn,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCreated: (date: Date) => void;
+  isLoggedIn: boolean;
+}) {
+  const publish = useNostrPublish();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [isAllDay, setIsAllDay] = useState(false);
+  const [title, setTitle] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [location, setLocation] = useState('');
+  const [detailsUrl, setDetailsUrl] = useState('');
+  const [summary, setSummary] = useState('');
+  const [formError, setFormError] = useState<string | undefined>();
+
+  const resetForm = () => {
+    setIsAllDay(false);
+    setTitle('');
+    setStartDate('');
+    setStartTime('');
+    setEndDate('');
+    setEndTime('');
+    setLocation('');
+    setDetailsUrl('');
+    setSummary('');
+    setFormError(undefined);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFormError(undefined);
+
+    const cleanTitle = title.trim();
+    const cleanLocation = location.trim();
+    const cleanSummary = summary.trim();
+    const cleanDetailsUrl = detailsUrl.trim();
+    const safeDetailsUrl = cleanDetailsUrl ? sanitizeUrl(cleanDetailsUrl) : undefined;
+
+    if (!cleanTitle) {
+      setFormError('Please add a title.');
+      return;
+    }
+
+    if (!startDate) {
+      setFormError('Please choose a start date.');
+      return;
+    }
+
+    if (!isAllDay && !startTime) {
+      setFormError('Please choose a start time, or mark the event as all day.');
+      return;
+    }
+
+    if (cleanDetailsUrl && !safeDetailsUrl) {
+      setFormError('Please use an https:// details link.');
+      return;
+    }
+
+    const start = isAllDay ? startDate : parseLocalDateTime(startDate, startTime);
+    const end = endDate ? (isAllDay ? endDate : parseLocalDateTime(endDate, endTime || startTime)) : undefined;
+
+    if (!start) {
+      setFormError('Please choose a valid start date and time.');
+      return;
+    }
+
+    if (typeof end === 'string' && typeof start === 'string' && end < start) {
+      setFormError('Please choose an end date after the start.');
+      return;
+    }
+
+    if (end instanceof Date && start instanceof Date && end.getTime() <= start.getTime()) {
+      setFormError('Please choose an end time after the start.');
+      return;
+    }
+
+    const kind = isAllDay ? 31922 : 31923;
+    const startTagValue = typeof start === 'string' ? start : secondsFromDate(start).toString();
+    const tags: string[][] = [
+      ['d', createEventIdentifier(cleanTitle, startDate)],
+      ['title', cleanTitle],
+      ['start', startTagValue],
+      ['t', 'purplekonnektiv'],
+    ];
+
+    if (!isAllDay) tags.push(['D', startDate]);
+    if (end) tags.push(['end', typeof end === 'string' ? end : secondsFromDate(end).toString()]);
+    if (cleanSummary) tags.push(['summary', cleanSummary]);
+    if (cleanLocation) tags.push(['location', cleanLocation]);
+    if (safeDetailsUrl) tags.push(['r', safeDetailsUrl]);
+
+    try {
+      await publish.mutateAsync({
+        kind,
+        content: cleanSummary,
+        tags,
+      });
+      await queryClient.invalidateQueries({ queryKey: ['nostr', 'purplekonnektiv', 'calendar'] });
+      toast({
+        title: 'Event published',
+        description: 'Your PurpleKonnektiv calendar event is on its way to the relays.',
+      });
+      onCreated(start instanceof Date ? start : new Date(`${start}T00:00:00`));
+      resetForm();
+      onOpenChange(false);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Publishing failed. Please try again.');
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button className="h-12 rounded-[4px] border-2 border-[#241232] !bg-[#6d28d9] px-6 text-base font-bold !text-white shadow-[4px_4px_0_#241232] hover:!bg-[#5b21b6] dark:!border-[#e879f9] dark:shadow-[4px_4px_0_#e879f9]">
+          <Plus className="mr-2 size-4" />
+          Create event
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[4px] border-2 border-[#241232] bg-[#fffdf7] text-[#241232] shadow-[8px_8px_0_#6d28d9] dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7]">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-black text-[#241232] dark:text-[#fffdf7]">Create calendar event</DialogTitle>
+          <DialogDescription className="text-[#5f4a6f] dark:text-[#d8c4ea]">
+            Add a meetup, call, workshop, or gathering to the PurpleKonnektiv calendar.
+          </DialogDescription>
+        </DialogHeader>
+
+        {!isLoggedIn ? (
+          <div className="border-2 border-dashed border-[#a855f7] bg-[#f7f2ff] p-5 dark:bg-[#151019]">
+            <p className="mb-4 text-sm font-semibold leading-6 text-[#3b234f] dark:text-[#d8c4ea]">
+              Sign in with your Nostr account to publish a calendar event.
+            </p>
+            <LoginArea className="max-w-64" />
+          </div>
+        ) : (
+          <form className="grid gap-5" onSubmit={handleSubmit}>
+            <div className="grid gap-2">
+              <Label htmlFor="event-title" className="font-bold text-[#241232] dark:text-[#fffdf7]">Title</Label>
+              <Input id="event-title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="PurpleKonnektiv meetup" className="rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+            </div>
+
+            <div className="flex items-center justify-between gap-4 border-2 border-[#a855f7] bg-[#f7f2ff] p-3 dark:bg-[#151019]">
+              <Label htmlFor="event-all-day" className="font-bold text-[#241232] dark:text-[#fffdf7]">All day</Label>
+              <Switch id="event-all-day" checked={isAllDay} onCheckedChange={setIsAllDay} />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="event-start-date" className="font-bold text-[#241232] dark:text-[#fffdf7]">Start date</Label>
+                <Input id="event-start-date" type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} className="rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+              </div>
+              {!isAllDay ? (
+                <div className="grid gap-2">
+                  <Label htmlFor="event-start-time" className="font-bold text-[#241232] dark:text-[#fffdf7]">Start time</Label>
+                  <Input id="event-start-time" type="time" value={startTime} onChange={(event) => setStartTime(event.target.value)} className="rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+                </div>
+              ) : null}
+              <div className="grid gap-2">
+                <Label htmlFor="event-end-date" className="font-bold text-[#241232] dark:text-[#fffdf7]">End date</Label>
+                <Input id="event-end-date" type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} className="rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+              </div>
+              {!isAllDay ? (
+                <div className="grid gap-2">
+                  <Label htmlFor="event-end-time" className="font-bold text-[#241232] dark:text-[#fffdf7]">End time</Label>
+                  <Input id="event-end-time" type="time" value={endTime} onChange={(event) => setEndTime(event.target.value)} className="rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+                </div>
+              ) : null}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="event-location" className="font-bold text-[#241232] dark:text-[#fffdf7]">Location</Label>
+              <Input id="event-location" value={location} onChange={(event) => setLocation(event.target.value)} placeholder="Online, Berlin, local cafe..." className="rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="event-details" className="font-bold text-[#241232] dark:text-[#fffdf7]">Details link</Label>
+              <Input id="event-details" type="url" value={detailsUrl} onChange={(event) => setDetailsUrl(event.target.value)} placeholder="https://..." className="rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="event-summary" className="font-bold text-[#241232] dark:text-[#fffdf7]">Summary</Label>
+              <Textarea id="event-summary" value={summary} onChange={(event) => setSummary(event.target.value)} placeholder="What should people know before they show up?" className="min-h-28 rounded-[4px] border-2 border-[#241232] bg-white dark:border-[#a855f7] dark:bg-[#151019]" />
+            </div>
+
+            {formError ? <p className="text-sm font-bold text-[#b42318] dark:text-[#fda29b]">{formError}</p> : null}
+
+            <DialogFooter>
+              <Button type="submit" disabled={publish.isPending} className="h-11 rounded-[4px] border-2 border-[#241232] !bg-[#6d28d9] px-5 font-bold !text-white shadow-[3px_3px_0_#241232] hover:!bg-[#5b21b6] disabled:opacity-60 dark:!border-[#e879f9] dark:shadow-[3px_3px_0_#e879f9]">
+                {publish.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Publishing
+                  </>
+                ) : 'Publish event'}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function CalendarEventCard({ event }: { event: CalendarEventView }) {
   return (
     <article className="border border-[#a855f7] bg-[#f7f2ff] p-2 shadow-[2px_2px_0_#a855f7] dark:bg-[#151019]">
@@ -167,6 +409,25 @@ function buildMonthDays(month: Date): Date[] {
     day.setDate(firstGridDate.getDate() + index);
     return day;
   });
+}
+
+function parseLocalDateTime(date: string, time: string): Date | undefined {
+  const parsed = new Date(`${date}T${time}`);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+function secondsFromDate(date: Date): number {
+  return Math.floor(date.getTime() / 1000);
+}
+
+function createEventIdentifier(title: string, date: string): string {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 48) || 'purplekonnektiv-event';
+
+  return `${slug}-${date}-${Date.now().toString(36)}`;
 }
 
 function isSameCalendarDay(a: Date, b: Date): boolean {
