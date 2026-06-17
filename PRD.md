@@ -170,7 +170,25 @@ The product should never introduce nested routes like `/note/:id` or `/profile/:
 - Prefer cards for repeated feed/event items, not for every page section.
 - Provide clear focus-visible states for keyboard users.
 
-## 9. Data Model Notes
+## 9. Documentation Requirements
+
+The project must include good documentation in the `/docs` folder.
+
+Documentation should cover:
+
+- Product overview and PurpleKonnektiv mission.
+- How the `#purplekonnektiv` hashtag powers feed and calendar discovery.
+- Supported Nostr event kinds and relevant NIPs.
+- Feed data model for kinds `1` and `20`.
+- Calendar data model for NIP-52 kinds `31922` and `31923`.
+- Relay assumptions and configuration notes.
+- Content safety and URL sanitization expectations.
+- Local development, testing, build, and deployment steps.
+- Guidance for contributors who want their posts or events to appear on the site.
+
+Documentation should be kept current with implementation changes and should favor practical examples over abstract protocol descriptions.
+
+## 10. Data Model Notes
 
 ### Feed Filter
 
@@ -209,23 +227,25 @@ The product should never introduce nested routes like `/note/:id` or `/profile/:
 - `end_tzid`: IANA timezone for end
 - `D`: day-granularity timestamp for time-based events
 
-## 10. Success Metrics
+## 11. Success Metrics
 
 - A visitor can understand the collective and find live community content without logging in.
 - Feed and calendar content comes from Nostr events tagged `#purplekonnektiv`.
 - The page works across mobile and desktop.
 - Invalid or malicious Nostr content does not break rendering or create XSS risk.
+- The `/docs` folder contains clear, useful documentation for users, contributors, and maintainers.
 - Build, type-check, and tests pass before release.
 
-## 11. Open Questions
+## 12. Open Questions
 
 - Should the first version include a compose flow for publishing `#purplekonnektiv` notes?
 - Should trusted collective members be featured separately from the public hashtag feed?
 - Should event discovery be fully open by hashtag, or should a curated `kind: 31924` calendar become canonical later?
 - Which relays should be recommended for PurpleKonnektiv content beyond the app defaults?
 - Should the site include a static manifesto/about page in addition to the Nostr-native feed?
+- Should `/docs` be purely developer-facing, or should parts of it be rendered publicly on the website?
 
-## 12. Release Plan
+## 13. Release Plan
 
 ### Milestone 1: Public Homepage
 
@@ -249,5 +269,6 @@ The product should never introduce nested routes like `/note/:id` or `/profile/:
 
 - Improve responsive behavior.
 - Run accessibility checks.
+- Add and review `/docs` documentation.
 - Run type-check, lint, tests, and production build.
 - Review security handling for event-sourced content.
