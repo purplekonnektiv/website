@@ -69,16 +69,6 @@ export function PurpleKonnektivHome() {
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(36,18,50,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(36,18,50,0.08)_1px,transparent_1px)] bg-[size:28px_28px] dark:bg-[linear-gradient(rgba(168,85,247,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.18)_1px,transparent_1px)]" />
           <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:py-24">
             <div className="space-y-8">
-              <div className="flex flex-wrap gap-2">
-                <Badge className="rounded-[4px] border-2 border-[#241232] bg-[#f7c948] px-3 py-1 font-mono text-[#241232] shadow-[3px_3px_0_#241232]">
-                  <Heart className="mr-1 size-3.5" />
-                  community pulse
-                </Badge>
-                <Badge className="rounded-[4px] border-2 border-[#241232] bg-[#fffdf7] px-3 py-1 font-mono text-[#241232] shadow-[3px_3px_0_#6d28d9]">
-                  #purplekonnektiv
-                </Badge>
-              </div>
-
               <div className="space-y-5">
                 <h1 className="max-w-5xl font-black uppercase leading-[0.86] tracking-normal text-[#241232] text-[3.25rem] dark:text-[#fffdf7] sm:text-[6rem] lg:text-[8.5rem]">
                   Purple
