@@ -47,8 +47,8 @@ const tickerItems = [
 
 const navItems = [
   { label: 'Mission', href: '#mission' },
-  { label: 'Feed', href: '#feed' },
-  { label: 'Calendar', href: '#calendar' },
+  { label: 'Feed', href: '/feed' },
+  { label: 'Calendar', href: '/calendar' },
   { label: 'Join in', href: '#join' },
 ];
 
@@ -81,16 +81,16 @@ export function PurpleKonnektivHome() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button asChild className="h-12 rounded-[4px] border-2 border-[#241232] !bg-[#6d28d9] px-6 text-base font-bold !text-white shadow-[4px_4px_0_#241232] hover:!bg-[#5b21b6] dark:!border-[#e879f9] dark:shadow-[4px_4px_0_#e879f9]">
-                  <a href="#feed">
+                  <Link to="/feed">
                     Explore the feed
                     <ArrowRight className="ml-2 size-4" />
-                  </a>
+                  </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-12 rounded-[4px] border-2 border-[#241232] !bg-[#fffdf7] px-6 text-base font-bold !text-[#241232] shadow-[4px_4px_0_#a855f7] hover:!bg-[#f4e8ff] dark:!border-[#e879f9] dark:!bg-[#241232] dark:!text-[#fffdf7] dark:shadow-[4px_4px_0_#6d28d9] dark:hover:!bg-[#30183f]">
-                  <a href="#calendar">
+                  <Link to="/calendar">
                     View calendar
                     <CalendarDays className="ml-2 size-4" />
-                  </a>
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -103,12 +103,6 @@ export function PurpleKonnektivHome() {
               <div className="grid gap-4">
                 <SocialNote title="Meetup stories" text="Notes, photos, and reflections from PurpleKonnektiv gatherings and calls." />
                 <SocialNote title="Gatherings in one place" text="Upcoming meetups, calls, workshops, and local hangouts collected into a shared calendar." />
-                <Button asChild variant="outline" className="mt-2 rounded-[4px] border-2 border-[#241232] !bg-[#fffdf7] !text-[#241232] shadow-[4px_4px_0_#a855f7] dark:!border-[#e879f9] dark:!bg-[#151019] dark:!text-[#fffdf7]">
-                  <Link to="/relays">
-                    Manage connections
-                    <Settings className="ml-2 size-4" />
-                  </Link>
-                </Button>
               </div>
             </aside>
           </div>
@@ -194,9 +188,17 @@ export function PurpleKonnektivHome() {
       </main>
 
       <footer className="border-t-2 border-[#241232] bg-[#241232] px-5 py-8 text-[#fffdf7] dark:border-[#a855f7] dark:bg-[#0f0a14] sm:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-mono font-bold">PurpleKonnektiv</p>
-          <p className="text-[#d8c4ea]">A shared stream for PurpleKonnektiv meetups and community follow-up.</p>
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-mono font-bold">PurpleKonnektiv</p>
+            <p className="mt-1 text-[#d8c4ea]">A shared stream for PurpleKonnektiv meetups and community follow-up.</p>
+          </div>
+          <Button asChild variant="outline" className="w-fit rounded-[4px] border-2 border-[#fffdf7] !bg-transparent !text-[#fffdf7] hover:!bg-[#30183f] dark:!border-[#a855f7]">
+            <Link to="/relays">
+              Manage connections
+              <Settings className="ml-2 size-4" />
+            </Link>
+          </Button>
         </div>
       </footer>
     </div>
@@ -212,9 +214,15 @@ function SiteNav() {
         </a>
         <div className="hidden items-center gap-5 md:flex">
           {navItems.map((item) => (
-            <a key={item.href} href={item.href} className="text-sm font-bold text-[#3b234f] underline-offset-4 hover:text-[#6d28d9] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9] dark:text-[#d8c4ea] dark:hover:text-[#e879f9]">
-              {item.label}
-            </a>
+            item.href.startsWith('/') ? (
+              <Link key={item.href} to={item.href} className="text-sm font-bold text-[#3b234f] underline-offset-4 hover:text-[#6d28d9] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9] dark:text-[#d8c4ea] dark:hover:text-[#e879f9]">
+                {item.label}
+              </Link>
+            ) : (
+              <a key={item.href} href={item.href} className="text-sm font-bold text-[#3b234f] underline-offset-4 hover:text-[#6d28d9] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9] dark:text-[#d8c4ea] dark:hover:text-[#e879f9]">
+                {item.label}
+              </a>
+            )
           ))}
           <Link to="/relays" className="text-sm font-bold text-[#3b234f] underline-offset-4 hover:text-[#6d28d9] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9] dark:text-[#d8c4ea] dark:hover:text-[#e879f9]">
             Connections
@@ -298,7 +306,7 @@ function SectionHeader({ eyebrow, title, description, inverted = false }: { eyeb
   );
 }
 
-function FeedCard({ event }: { event: NostrEvent }) {
+export function FeedCard({ event }: { event: NostrEvent }) {
   const author = useAuthor(event.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = metadata?.display_name ?? metadata?.name ?? shortPubkey(event.pubkey);
@@ -439,7 +447,7 @@ function SocialCard({ title, text }: { title: string; text: string }) {
   );
 }
 
-function StateCard({ title, text, inverted = false }: { title: string; text: string; inverted?: boolean }) {
+export function StateCard({ title, text, inverted = false }: { title: string; text: string; inverted?: boolean }) {
   return (
     <div className={cn('border-2 border-dashed p-8 text-center', inverted ? 'border-[#fffdf7] text-[#fffdf7]' : 'border-[#241232] bg-[#fffdf7] text-[#241232] dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7]')}>
       <p className="text-xl font-black">{title}</p>
@@ -448,7 +456,7 @@ function StateCard({ title, text, inverted = false }: { title: string; text: str
   );
 }
 
-function FeedSkeleton() {
+export function FeedSkeleton() {
   return (
     <div className="grid gap-5 lg:grid-cols-3">
       {Array.from({ length: 6 }, (_, index) => (

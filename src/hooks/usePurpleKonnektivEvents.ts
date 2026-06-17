@@ -1,6 +1,6 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import { normalizeCalendarEvent, type CalendarEventView } from '@/lib/nostrContent';
 
@@ -20,6 +20,35 @@ export function usePurpleKonnektivFeed() {
       return events
         .filter((event) => event.kind === 1 || event.kind === 20)
         .sort((a, b) => b.created_at - a.created_at);
+    },
+  });
+}
+
+export function usePurpleKonnektivFeedPages(pageSize = 12) {
+  const { nostr } = useNostr();
+
+  return useInfiniteQuery<NostrEvent[]>({
+    queryKey: ['nostr', 'purplekonnektiv', 'feed', 'pages', pageSize],
+    initialPageParam: undefined,
+    queryFn: async ({ pageParam, signal }) => {
+      const until = typeof pageParam === 'number' ? pageParam : undefined;
+      const events = await nostr.query(
+        [{
+          kinds: [1, 20],
+          '#t': [PURPLE_TAG],
+          limit: pageSize,
+          ...(until ? { until } : {}),
+        }],
+        { signal },
+      );
+
+      return events
+        .filter((event) => event.kind === 1 || event.kind === 20)
+        .sort((a, b) => b.created_at - a.created_at);
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length < pageSize) return undefined;
+      return Math.min(...lastPage.map((event) => event.created_at)) - 1;
     },
   });
 }
