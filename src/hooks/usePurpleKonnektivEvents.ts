@@ -53,6 +53,25 @@ export function usePurpleKonnektivFeedPages(pageSize = 12) {
   });
 }
 
+export function usePurpleKonnektivPost(id: string | undefined) {
+  const { nostr } = useNostr();
+
+  return useQuery<NostrEvent | undefined>({
+    queryKey: ['nostr', 'purplekonnektiv', 'post', id],
+    enabled: Boolean(id),
+    queryFn: async (context) => {
+      if (!id) return undefined;
+
+      const events = await nostr.query(
+        [{ ids: [id], kinds: [1, 20], limit: 1 }],
+        { signal: context.signal },
+      );
+
+      return events.find((event) => event.kind === 1 || event.kind === 20);
+    },
+  });
+}
+
 export function usePurpleKonnektivCalendar() {
   const { nostr } = useNostr();
 

@@ -309,16 +309,18 @@ function SectionHeader({ eyebrow, title, description, inverted = false }: { eyeb
   );
 }
 
-export function FeedCard({ event, textMode = 'full' }: { event: NostrEvent; textMode?: 'full' | 'preview' }) {
+export function FeedCard({ event, textMode = 'full', linkToPost = true }: { event: NostrEvent; textMode?: 'full' | 'preview'; linkToPost?: boolean }) {
   const author = useAuthor(event.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = metadata?.display_name ?? metadata?.name ?? shortPubkey(event.pubkey);
   const avatarUrl = sanitizeUrl(metadata?.picture);
   const imageUrls = extractImageUrls(event);
   const text = event.kind === 1 ? stripImageUrls(event.content) : event.content.trim();
-
-  return (
-    <Card className="min-w-0 max-w-full gap-0 overflow-hidden rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[6px_6px_0_#6d28d9] motion-safe:hover:-translate-y-1">
+  const card = (
+    <Card className={cn(
+      'min-w-0 max-w-full gap-0 overflow-hidden rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[6px_6px_0_#6d28d9]',
+      linkToPost && 'motion-safe:group-hover:-translate-y-1',
+    )}>
       <CardHeader className="min-w-0 gap-0 border-b-2 border-[#241232] p-4 dark:border-[#a855f7]">
         <div className="flex min-w-0 items-center gap-3">
           <Avatar className="border-2 border-[#241232]">
@@ -348,6 +350,18 @@ export function FeedCard({ event, textMode = 'full' }: { event: NostrEvent; text
         <p className="font-mono text-xs font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">#purplekonnektiv</p>
       </CardContent>
     </Card>
+  );
+
+  if (!linkToPost) return card;
+
+  return (
+    <Link
+      to={`/post/${event.id}`}
+      aria-label={`Open post by ${displayName}`}
+      className="group block min-w-0 max-w-full outline-none focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#e879f9]"
+    >
+      {card}
+    </Link>
   );
 }
 

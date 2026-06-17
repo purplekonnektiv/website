@@ -6,6 +6,7 @@ import Calendar from "./pages/Calendar";
 import Feed from "./pages/Feed";
 import { NIP19Page } from "./pages/NIP19Page";
 import NotFound from "./pages/NotFound";
+import Post from "./pages/Post";
 import Relays from "./pages/Relays";
 
 export function AppRouter() {
@@ -17,6 +18,7 @@ export function AppRouter() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/relays" element={<Relays />} />
+        <Route path="/post/:id" element={<Post />} />
         {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1 */}
         <Route path="/:nip19" element={<NIP19Page />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
