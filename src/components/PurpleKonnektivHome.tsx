@@ -1,4 +1,5 @@
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
+import type { KeyboardEvent } from 'react';
 import {
   ArrowRight,
   CalendarDays,
@@ -15,7 +16,7 @@ import {
   Users,
 } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -310,17 +311,34 @@ function SectionHeader({ eyebrow, title, description, inverted = false }: { eyeb
 }
 
 export function FeedCard({ event, textMode = 'full', linkToPost = true }: { event: NostrEvent; textMode?: 'full' | 'preview'; linkToPost?: boolean }) {
+  const navigate = useNavigate();
   const author = useAuthor(event.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = metadata?.display_name ?? metadata?.name ?? shortPubkey(event.pubkey);
   const avatarUrl = sanitizeUrl(metadata?.picture);
   const imageUrls = extractImageUrls(event);
   const text = event.kind === 1 ? stripImageUrls(event.content) : event.content.trim();
-  const card = (
+  const postPath = `/post/${event.id}`;
+
+  const openPost = () => navigate(postPath);
+  const handleCardKeyDown = (keyboardEvent: KeyboardEvent<HTMLDivElement>) => {
+    if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+      keyboardEvent.preventDefault();
+      openPost();
+    }
+  };
+
+  return (
     <Card className={cn(
-      'min-w-0 max-w-full gap-0 overflow-hidden rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[6px_6px_0_#6d28d9]',
-      linkToPost && 'motion-safe:group-hover:-translate-y-1',
-    )}>
+      'min-w-0 max-w-full gap-0 overflow-hidden rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#e879f9] dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[6px_6px_0_#6d28d9]',
+      linkToPost && 'cursor-pointer motion-safe:hover:-translate-y-1',
+    )}
+      role={linkToPost ? 'link' : undefined}
+      tabIndex={linkToPost ? 0 : undefined}
+      aria-label={linkToPost ? `Open post by ${displayName}` : undefined}
+      onClick={linkToPost ? openPost : undefined}
+      onKeyDown={linkToPost ? handleCardKeyDown : undefined}
+    >
       <CardHeader className="min-w-0 gap-0 border-b-2 border-[#241232] p-4 dark:border-[#a855f7]">
         <div className="flex min-w-0 items-center gap-3">
           <Avatar className="border-2 border-[#241232]">
@@ -350,18 +368,6 @@ export function FeedCard({ event, textMode = 'full', linkToPost = true }: { even
         <p className="font-mono text-xs font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">#purplekonnektiv</p>
       </CardContent>
     </Card>
-  );
-
-  if (!linkToPost) return card;
-
-  return (
-    <Link
-      to={`/post/${event.id}`}
-      aria-label={`Open post by ${displayName}`}
-      className="group block min-w-0 max-w-full outline-none focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#e879f9]"
-    >
-      {card}
-    </Link>
   );
 }
 
@@ -401,12 +407,18 @@ function ProfileMention({ identifier }: { identifier: string }) {
 
 function EventReference({ identifier }: { identifier: string }) {
   const reference = decodeEventIdentifier(identifier);
+  if (!reference) return null;
 
   return (
-    <span className="mx-1 inline-flex max-w-full items-center gap-1 rounded-[4px] border border-[#a855f7] bg-[#f7f2ff] px-2 py-0.5 align-baseline font-mono text-xs font-bold uppercase text-[#6d28d9] [overflow-wrap:anywhere] dark:bg-[#1c1027] dark:text-[#e879f9]">
+    <Link
+      to={reference.href}
+      onClick={(clickEvent) => clickEvent.stopPropagation()}
+      onKeyDown={(keyboardEvent) => keyboardEvent.stopPropagation()}
+      className="mx-1 inline-flex max-w-full items-center gap-1 rounded-[4px] border border-[#a855f7] bg-[#f7f2ff] px-2 py-0.5 align-baseline font-mono text-xs font-bold uppercase text-[#6d28d9] underline-offset-4 [overflow-wrap:anywhere] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6d28d9] dark:bg-[#1c1027] dark:text-[#e879f9] dark:focus-visible:outline-[#e879f9]"
+    >
       <MessageCircle className="size-3 shrink-0" />
-      {reference}
-    </span>
+      {reference.label}
+    </Link>
   );
 }
 
@@ -457,8 +469,8 @@ function decodeNostrReference(identifier: string): { type: 'profile' | 'event'; 
   const profilePubkey = decodeProfileIdentifier(identifier);
   if (profilePubkey) return { type: 'profile', value: profilePubkey };
 
-  const eventLabel = decodeEventIdentifier(identifier);
-  if (eventLabel) return { type: 'event', value: eventLabel };
+  const eventReference = decodeEventIdentifier(identifier);
+  if (eventReference) return { type: 'event', value: eventReference.href };
 
   return undefined;
 }
@@ -474,20 +486,20 @@ function decodeProfileIdentifier(identifier: string): string | undefined {
   }
 }
 
-function decodeEventIdentifier(identifier: string): string | undefined {
+function decodeEventIdentifier(identifier: string): { label: string; href: string } | undefined {
   try {
     const decoded = nip19.decode(identifier);
 
     if (decoded.type === 'note') {
-      return `post ${shortEventId(decoded.data)}`;
+      return { label: `post ${shortEventId(decoded.data)}`, href: `/post/${decoded.data}` };
     }
 
     if (decoded.type === 'nevent') {
-      return `post ${shortEventId(decoded.data.id)}`;
+      return { label: `post ${shortEventId(decoded.data.id)}`, href: `/post/${decoded.data.id}` };
     }
 
     if (decoded.type === 'naddr') {
-      return 'shared event';
+      return { label: 'shared event', href: `/${identifier}` };
     }
 
     return undefined;
