@@ -49,7 +49,7 @@ Avoid:
 
 Use purple as the identity anchor, but avoid a one-note all-purple interface.
 
-Suggested palette:
+Light mode should use a warm paper base with high-contrast ink and a purple identity layer:
 
 - `Purple Core`: `#6D28D9` for primary actions and identity marks.
 - `Deep Violet`: `#241232` for dark text, footer, and high-contrast surfaces.
@@ -61,12 +61,28 @@ Suggested palette:
 - `Protocol Green`: `#17A673` as a secondary accent for live/verified states.
 - `Relay Yellow`: `#F7C948` as a tertiary accent for ticker details or calendar highlights.
 
+Dark mode should remain PurpleKonnektiv-specific, not fall back to generic blue/slate shadcn defaults:
+
+- `Night Ink`: `#151019` for the page background.
+- `Deep Violet`: `#241232` for elevated surfaces and nav/footer panels.
+- `Black Signal`: `#0F0A14` for the darkest broadcast/feed bands.
+- `Chalk`: `#FFFDF7` for primary text.
+- `Mist Lilac`: `#D8C4EA` for secondary copy.
+- `Electric Lilac`: `#A855F7` for borders, focus rings, and active states.
+- `Signal Pink`: `#E879F9` for hover details, offset shadows, and small accents.
+- `Purple Core`: `#6D28D9` for retained identity marks and CTA fills.
+- `Protocol Green`: `#17A673` remains the secondary live/verified accent.
+- `Relay Yellow`: `#F7C948` remains a tertiary highlight, used sparingly.
+
 Usage rules:
 
 - Purple should lead, not flood.
 - Use off-white and ink-heavy contrast for readability.
 - Use green/yellow sparingly to prevent the site from becoming monochrome.
 - Feed and calendar cards should remain legible before they are decorative.
+- Preserve the same brand vocabulary across light and dark modes; dark mode should feel like a night version of the same editorial system.
+- Avoid default dark-mode neutrals such as slate/navy as the dominant theme unless they are replaced by the PurpleKonnektiv night tokens above.
+- Maintain WCAG 2.1 AA contrast in both modes for body text, controls, focus rings, and link states.
 
 ### Typography
 
@@ -112,6 +128,18 @@ The nav should feel practical and slightly editorial:
 - Mobile: compact menu with the same sections and visible login/account access.
 
 Use strong text links and clear hover/focus treatment. Avoid oversized pill buttons for every nav item.
+
+### Theme Controls
+
+The app supports `light`, `dark`, and `system` themes through `AppProvider`, persisted app config, and the `.light` / `.dark` classes on the document root.
+
+Expected behavior:
+
+- Respect the user's selected theme across reloads.
+- When set to `system`, follow `prefers-color-scheme` and respond to system changes.
+- Use icon controls for theme selection where space is tight: sun for light, moon for dark, monitor for system.
+- Expose theme controls in navigation or account/settings surfaces, not only in a hidden developer-only area.
+- Keep focus-visible rings obvious in all three theme states.
 
 ### Ticker
 
@@ -310,11 +338,13 @@ Avoid:
 - Keep cards at `8px` radius or less unless a local component requires otherwise.
 - Use `cn()` for class composition.
 - Use lucide icons where icons are needed.
-- Define color and font tokens in CSS variables.
+- Define color and font tokens in CSS variables, including PurpleKonnektiv-specific dark-mode values.
+- Keep component-level hard-coded colors aligned with the documented palette until they can be consolidated into tokens.
 - Keep sections as full-width bands with constrained inner content.
 - Do not nest UI cards inside UI cards.
 - Do not add unsafe HTML rendering for Nostr content.
 - Sanitize all event-sourced URLs before rendering.
+- Keep theme state in the existing `AppProvider` / `useTheme` flow; do not introduce a second theme store.
 
 ## 13. Documentation Tie-In
 
@@ -322,7 +352,7 @@ The `/docs` folder should document the design system once implementation begins.
 
 Recommended docs:
 
-- `/docs/design-system.md`: colors, typography, spacing, components.
+- `/docs/design-system.md`: light/dark colors, typography, spacing, components, motion, and theme-control behavior.
 - `/docs/content-guidelines.md`: tone, hashtags, event posting guidance.
 - `/docs/nostr-data.md`: feed and calendar event kinds, tags, and validation.
 
@@ -332,6 +362,7 @@ Recommended docs:
 - The visual direction feels inspired by `einundzwanzig.space` but has its own purple Nostr identity.
 - The feed and calendar are visually central, not secondary widgets.
 - The interface remains readable and usable at 360px width.
+- Light, dark, and system theme modes are visibly intentional and share the same brand system.
 - Motion respects `prefers-reduced-motion`.
-- UI contrast meets WCAG 2.1 AA.
+- UI contrast meets WCAG 2.1 AA in light and dark modes.
 - The design avoids generic purple SaaS styling.
