@@ -131,7 +131,7 @@ Use strong text links and clear hover/focus treatment. Avoid oversized pill butt
 
 ### Theme Controls
 
-The app supports `light`, `dark`, and `system` themes through `AppProvider`, persisted app config, and the `.dark` class on the document root.
+The app supports `light`, `dark`, and `system` themes through `AppProvider`, persisted app config, and the `.light` / `.dark` classes on the document root.
 
 Expected behavior:
 
