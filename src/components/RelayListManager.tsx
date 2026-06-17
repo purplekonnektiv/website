@@ -46,8 +46,8 @@ export function RelayListManager() {
   const isValidRelayUrl = (url: string): boolean => {
     if (!url.trim()) return false;
     try {
-      new URL(normalizeRelayUrl(url));
-      return true;
+      const parsed = new URL(normalizeRelayUrl(url));
+      return parsed.protocol === 'wss:';
     } catch {
       return false;
     }
