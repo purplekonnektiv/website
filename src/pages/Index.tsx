@@ -4,10 +4,10 @@ import { PurpleKonnektivHome } from '@/components/PurpleKonnektivHome';
 
 const Index = () => {
   useSeoMeta({
-    title: 'PurpleKonnektiv - Nostr-native collective signal',
-    description: 'PurpleKonnektiv surfaces Nostr posts and NIP-52 events tagged #purplekonnektiv for a collective around decentralized social media.',
+    title: 'PurpleKonnektiv - Community feed and calendar',
+    description: 'PurpleKonnektiv gathers posts, images, and events shared with #purplekonnektiv.',
     ogTitle: 'PurpleKonnektiv',
-    ogDescription: 'A Nostr-native website for posts, images, and events tagged #purplekonnektiv.',
+    ogDescription: 'A social home for posts, images, and events shared with #purplekonnektiv.',
     ogType: 'website',
   });
 

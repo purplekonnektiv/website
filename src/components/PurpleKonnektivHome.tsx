@@ -3,17 +3,18 @@ import {
   ArrowRight,
   CalendarDays,
   ExternalLink,
-  FileText,
+  Heart,
   Image as ImageIcon,
   MapPin,
+  MessageCircle,
   Monitor,
   Moon,
-  Radio,
+  Settings,
   Sparkles,
   Sun,
   Users,
-  Wifi,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,19 +37,19 @@ import { cn } from '@/lib/utils';
 
 const tickerItems = [
   '#purplekonnektiv',
-  'Nostr native',
-  'Dezentrale soziale Medien',
-  'Open protocols',
-  'Kind 1 + Kind 20',
-  'NIP-52 events',
-  'Relays over platforms',
+  'Community notes',
+  'Meetups and calls',
+  'Decentralized social media',
+  'Photos from the collective',
+  'Open conversations',
+  'People over platforms',
 ];
 
 const navItems = [
   { label: 'Mission', href: '#mission' },
   { label: 'Feed', href: '#feed' },
   { label: 'Calendar', href: '#calendar' },
-  { label: 'Docs', href: '#docs' },
+  { label: 'Join in', href: '#join' },
 ];
 
 export function PurpleKonnektivHome() {
@@ -57,7 +58,6 @@ export function PurpleKonnektivHome() {
   const feedEvents = feed.data ?? [];
   const calendarEvents = calendar.data ?? [];
   const upcomingEvents = calendarEvents.filter((event) => !event.isPast);
-  const pastEvents = calendarEvents.filter((event) => event.isPast).slice(0, 3);
 
   return (
     <div className="min-h-screen overflow-hidden bg-[#f7f2ff] text-[#151019] selection:bg-[#e879f9] selection:text-[#241232] dark:bg-[#151019] dark:text-[#fffdf7] dark:selection:bg-[#a855f7] dark:selection:text-[#fffdf7]">
@@ -71,8 +71,8 @@ export function PurpleKonnektivHome() {
             <div className="space-y-8">
               <div className="flex flex-wrap gap-2">
                 <Badge className="rounded-[4px] border-2 border-[#241232] bg-[#f7c948] px-3 py-1 font-mono text-[#241232] shadow-[3px_3px_0_#241232]">
-                  <Radio className="mr-1 size-3.5" />
-                  live from the relays
+                  <Heart className="mr-1 size-3.5" />
+                  community pulse
                 </Badge>
                 <Badge className="rounded-[4px] border-2 border-[#241232] bg-[#fffdf7] px-3 py-1 font-mono text-[#241232] shadow-[3px_3px_0_#6d28d9]">
                   #purplekonnektiv
@@ -85,7 +85,7 @@ export function PurpleKonnektivHome() {
                   <span className="block text-[#6d28d9]">Konnektiv</span>
                 </h1>
                 <p className="max-w-3xl text-xl font-semibold leading-8 text-[#3b234f] dark:text-[#d8c4ea] sm:text-2xl sm:leading-9">
-                  A Nostr-native signal for humans who think decentralized social media and open information protocols matter.
+                  A social home for people who care about decentralized conversation, shared learning, and meeting beyond platform walls.
                 </p>
               </div>
 
@@ -107,14 +107,18 @@ export function PurpleKonnektivHome() {
 
             <aside className="self-end border-2 border-[#241232] bg-[#fffdf7] p-5 shadow-[8px_8px_0_#6d28d9] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[8px_8px_0_#6d28d9]">
               <div className="mb-5 flex items-center justify-between gap-3 border-b-2 border-[#241232] pb-3 dark:border-[#a855f7]">
-                <p className="font-mono text-sm font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">Protocol board</p>
-                <Wifi className="size-5 text-[#17a673]" />
+                <p className="font-mono text-sm font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">What happens here</p>
+                <Sparkles className="size-5 text-[#17a673]" />
               </div>
-              <div className="grid gap-3 font-mono text-sm">
-                <SignalRow label="Feed" value="kind 1 + kind 20" />
-                <SignalRow label="Events" value="NIP-52" />
-                <SignalRow label="Tag" value="#purplekonnektiv" />
-                <SignalRow label="Source" value="Nostr relays" />
+              <div className="grid gap-4">
+                <SocialNote title="Posts from the community" text="Thoughts, images, questions, and moments shared with the PurpleKonnektiv tag." />
+                <SocialNote title="Gatherings in one place" text="Upcoming meetups, calls, workshops, and local hangouts collected into a shared calendar." />
+                <Button asChild variant="outline" className="mt-2 rounded-[4px] border-2 border-[#241232] !bg-[#fffdf7] !text-[#241232] shadow-[4px_4px_0_#a855f7] dark:!border-[#e879f9] dark:!bg-[#151019] dark:!text-[#fffdf7]">
+                  <Link to="/relays">
+                    Manage connections
+                    <Settings className="ml-2 size-4" />
+                  </Link>
+                </Button>
               </div>
             </aside>
           </div>
@@ -125,17 +129,17 @@ export function PurpleKonnektivHome() {
             <div>
               <p className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Mission</p>
               <h2 className="mt-3 max-w-md text-4xl font-black leading-none text-[#241232] dark:text-[#fffdf7] sm:text-5xl">
-                Relays over platforms. People over feeds.
+                People over platforms. Conversation over capture.
               </h2>
             </div>
             <div className="grid gap-5 text-lg leading-8 text-[#3b234f] dark:text-[#d8c4ea]">
               <p>
-                PurpleKonnektiv is a collective space for decentralization-minded people to meet, publish, and coordinate through Nostr. The website does not own the conversation; it surfaces the shared signal.
+                PurpleKonnektiv is a collective space for decentralization-minded people to meet, publish, coordinate, and keep in touch. The website is a window into the community, not the owner of it.
               </p>
               <div className="grid gap-4 sm:grid-cols-3">
                 <MissionCard icon={Users} title="Collective" text="Built around people, meetups, posts, and shared learning." />
-                <MissionCard icon={Radio} title="Protocol first" text="Content appears through tags and NIP-compatible events." />
-                <MissionCard icon={Sparkles} title="Open signal" text="Use #purplekonnektiv from a Nostr client to join the stream." />
+                <MissionCard icon={MessageCircle} title="Social" text="A shared stream for notes, images, questions, and conversations." />
+                <MissionCard icon={Sparkles} title="Open" text="Use #purplekonnektiv from your favorite app to join the stream." />
               </div>
             </div>
           </div>
@@ -145,16 +149,16 @@ export function PurpleKonnektivHome() {
           <SectionHeader
             eyebrow="Live feed"
             title="Posts tagged #purplekonnektiv"
-            description="Kind 1 notes and kind 20 image posts, queried directly from relays with the indexed t tag."
+            description="Recent notes and images from people around the PurpleKonnektiv community."
             inverted
           />
           <div className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
             {feed.isLoading ? (
               <FeedSkeleton />
             ) : feed.isError ? (
-              <StateCard title="The feed did not answer" text="Check relay connectivity and try again in a moment." inverted />
+              <StateCard title="The feed is quiet right now" text="Try refreshing, or check your connections if the stream stays empty." inverted />
             ) : feedEvents.length === 0 ? (
-              <StateCard title="No relay signal yet" text="Posts tagged #purplekonnektiv will appear here once relays return matching events." inverted />
+              <StateCard title="No posts yet" text="Share something with #purplekonnektiv and it can appear here." inverted />
             ) : (
               <div className="grid gap-5 lg:grid-cols-3">
                 {feedEvents.map((event) => (
@@ -168,51 +172,32 @@ export function PurpleKonnektivHome() {
         <section id="calendar" className="border-b-2 border-[#241232] bg-[#f7f2ff] dark:border-[#a855f7] dark:bg-[#151019]">
           <SectionHeader
             eyebrow="Calendar"
-            title="NIP-52 PurpleKonnektiv events"
-            description="Date-based and time-based calendar events tagged #purplekonnektiv, validated before they show up here."
+            title="Community calendar"
+            description="Meetups, calls, workshops, and gatherings shared by the PurpleKonnektiv community."
           />
-          <div className="mx-auto grid max-w-7xl gap-6 px-5 pb-16 sm:px-8 lg:grid-cols-[1fr_0.45fr]">
+          <div className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
             {calendar.isLoading ? (
               <CalendarSkeleton />
             ) : calendar.isError ? (
-              <StateCard title="Calendar query failed" text="The relay response did not arrive. Try refreshing or checking relay settings." />
+              <StateCard title="The calendar needs a moment" text="Try refreshing, or check your connections if events do not appear." />
             ) : calendarEvents.length === 0 ? (
-              <StateCard title="No calendar events yet" text="NIP-52 events tagged #purplekonnektiv will appear here after relays return matching events." />
+              <StateCard title="No events yet" text="Upcoming PurpleKonnektiv gatherings will appear here when the community shares them." />
             ) : (
-              <>
-                <div className="grid gap-5">
-                  {(upcomingEvents.length > 0 ? upcomingEvents : calendarEvents.slice(0, 6)).map((event) => (
-                    <CalendarCard key={event.id} calendarEvent={event} />
-                  ))}
-                </div>
-                <aside className="border-2 border-[#241232] bg-[#fffdf7] p-5 shadow-[6px_6px_0_#f7c948] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[6px_6px_0_#6d28d9]">
-                  <h3 className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Past signal</h3>
-                  <div className="mt-5 grid gap-4">
-                    {pastEvents.length === 0 ? (
-                      <p className="text-sm leading-6 text-[#5f4a6f] dark:text-[#d8c4ea]">Past events will collect here once the calendar has history.</p>
-                    ) : pastEvents.map((event) => (
-                      <div key={event.id} className="border-l-4 border-[#a855f7] pl-3">
-                        <p className="text-sm font-bold text-[#241232] dark:text-[#fffdf7]">{event.title}</p>
-                        <p className="mt-1 text-xs text-[#5f4a6f] dark:text-[#d8c4ea]">{event.startLabel}</p>
-                      </div>
-                    ))}
-                  </div>
-                </aside>
-              </>
+              <CalendarMonth events={upcomingEvents.length > 0 ? upcomingEvents : calendarEvents} />
             )}
           </div>
         </section>
 
-        <section id="docs" className="bg-[#fffdf7] dark:bg-[#1c1027]">
+        <section id="join" className="bg-[#fffdf7] dark:bg-[#1c1027]">
           <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <p className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Docs</p>
-              <h2 className="mt-3 text-4xl font-black leading-none text-[#241232] dark:text-[#fffdf7] sm:text-5xl">Document the protocol surface.</h2>
+              <p className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Join in</p>
+              <h2 className="mt-3 text-4xl font-black leading-none text-[#241232] dark:text-[#fffdf7] sm:text-5xl">Bring your people, posts, and plans.</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              <DocCard title="Design system" text="Colors, typography, spacing, and component rules live in docs." />
-              <DocCard title="Nostr data" text="Feed kinds, NIP-52 calendar tags, relay filters, and validation rules." />
-              <DocCard title="Contributing" text="How to publish posts and events that show up on the site." />
+              <SocialCard title="Say hello" text="Post a note with #purplekonnektiv and introduce what you are curious about." />
+              <SocialCard title="Share moments" text="Photos, sketches, links, and reflections help the collective feel alive." />
+              <SocialCard title="Host something" text="Add your meetup, call, or workshop so people know where to show up." />
             </div>
           </div>
         </section>
@@ -221,7 +206,7 @@ export function PurpleKonnektivHome() {
       <footer className="border-t-2 border-[#241232] bg-[#241232] px-5 py-8 text-[#fffdf7] dark:border-[#a855f7] dark:bg-[#0f0a14] sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p className="font-mono font-bold">PurpleKonnektiv</p>
-          <p className="text-[#d8c4ea]">Posts and events from Nostr relays via #purplekonnektiv.</p>
+          <p className="text-[#d8c4ea]">A shared social stream for #purplekonnektiv.</p>
         </div>
       </footer>
     </div>
@@ -241,6 +226,9 @@ function SiteNav() {
               {item.label}
             </a>
           ))}
+          <Link to="/relays" className="text-sm font-bold text-[#3b234f] underline-offset-4 hover:text-[#6d28d9] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9] dark:text-[#d8c4ea] dark:hover:text-[#e879f9]">
+            Connections
+          </Link>
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -289,11 +277,11 @@ function Ticker() {
   );
 }
 
-function SignalRow({ label, value }: { label: string; value: string }) {
+function SocialNote({ title, text }: { title: string; text: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-[#d9c7e7] pb-2 last:border-b-0 dark:border-[#6d28d9]">
-      <span className="text-[#7b638b] dark:text-[#d8c4ea]">{label}</span>
-      <span className="min-w-0 break-words text-right font-bold text-[#241232] dark:text-[#fffdf7]">{value}</span>
+    <div className="border-l-4 border-[#a855f7] pl-4">
+      <h3 className="font-mono text-sm font-black uppercase text-[#241232] dark:text-[#fffdf7]">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-[#5f4a6f] dark:text-[#d8c4ea]">{text}</p>
     </div>
   );
 }
@@ -340,7 +328,7 @@ function FeedCard({ event }: { event: NostrEvent }) {
             <CardTitle className="truncate text-base text-[#241232] dark:text-[#fffdf7]">{displayName}</CardTitle>
             <p className="font-mono text-xs text-[#7b638b] dark:text-[#d8c4ea]">{formatRelativeTime(event.created_at)}</p>
           </div>
-          <Badge className="ml-auto rounded-[4px] bg-[#241232] font-mono text-[#fffdf7]">kind {event.kind}</Badge>
+          <Badge className="ml-auto rounded-[4px] bg-[#241232] font-mono text-[#fffdf7]">post</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4 p-4">
@@ -362,53 +350,99 @@ function FeedCard({ event }: { event: NostrEvent }) {
   );
 }
 
-function CalendarCard({ calendarEvent }: { calendarEvent: CalendarEventView }) {
+function CalendarMonth({ events }: { events: CalendarEventView[] }) {
+  const anchorDate = events[0]?.startDate ?? new Date();
+  const monthStart = new Date(anchorDate.getFullYear(), anchorDate.getMonth(), 1);
+  const firstGridDate = new Date(monthStart);
+  firstGridDate.setDate(monthStart.getDate() - monthStart.getDay());
+
+  const days = Array.from({ length: 42 }, (_, index) => {
+    const day = new Date(firstGridDate);
+    day.setDate(firstGridDate.getDate() + index);
+    return day;
+  });
+
+  const monthLabel = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(anchorDate);
+
   return (
-    <article className={cn('grid gap-0 border-2 border-[#241232] bg-[#fffdf7] shadow-[6px_6px_0_#6d28d9] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[6px_6px_0_#6d28d9] md:grid-cols-[10rem_1fr]', calendarEvent.isPast && 'opacity-75')}>
-      <div className="border-b-2 border-[#241232] bg-[#6d28d9] p-5 text-[#fffdf7] dark:border-[#a855f7] md:border-b-0 md:border-r-2">
-        <p className="font-mono text-xs font-bold uppercase">{calendarEvent.isAllDay ? 'All day' : 'Timed'}</p>
-        <p className="mt-4 text-2xl font-black leading-tight">{calendarEvent.startDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</p>
-        <p className="mt-1 font-mono text-xs">{calendarEvent.startDate.getUTCFullYear()}</p>
+    <div className="border-2 border-[#241232] bg-[#fffdf7] shadow-[8px_8px_0_#6d28d9] dark:border-[#a855f7] dark:bg-[#241232]">
+      <div className="flex flex-col gap-3 border-b-2 border-[#241232] p-5 dark:border-[#a855f7] sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-mono text-sm font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">What is coming up</p>
+          <h3 className="mt-1 text-3xl font-black text-[#241232] dark:text-[#fffdf7]">{monthLabel}</h3>
+        </div>
+        <p className="text-sm font-semibold text-[#5f4a6f] dark:text-[#d8c4ea]">{events.length} event{events.length === 1 ? '' : 's'}</p>
       </div>
-      <div className="grid gap-4 p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h3 className="text-2xl font-black leading-tight text-[#241232] dark:text-[#fffdf7]">{calendarEvent.title}</h3>
-            <p className="mt-2 text-sm font-semibold text-[#5f4a6f] dark:text-[#d8c4ea]">
-              {calendarEvent.startLabel}
-              {calendarEvent.endLabel ? ` - ${calendarEvent.endLabel}` : ''}
-              {calendarEvent.timezone ? ` (${calendarEvent.timezone})` : ''}
-            </p>
+      <div className="grid grid-cols-7 border-b-2 border-[#241232] bg-[#f7f2ff] dark:border-[#a855f7] dark:bg-[#1c1027]">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+          <div key={day} className="p-2 text-center font-mono text-xs font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">
+            {day}
           </div>
-          <Badge className={cn('rounded-[4px] font-mono', calendarEvent.isPast ? 'bg-[#7b638b]' : 'bg-[#17a673] text-white')}>
-            {calendarEvent.isPast ? 'past' : 'upcoming'}
-          </Badge>
-        </div>
-        {calendarEvent.summary ? <p className="text-base leading-7 text-[#3b234f] dark:text-[#f1e7fb]">{calendarEvent.summary}</p> : null}
-        {calendarEvent.imageUrl ? <img src={calendarEvent.imageUrl} alt="" loading="lazy" className="aspect-[16/9] w-full border-2 border-[#241232] object-cover" /> : null}
-        <div className="flex flex-wrap gap-3 text-sm text-[#5f4a6f] dark:text-[#d8c4ea]">
-          {calendarEvent.locations.map((location) => (
-            <span key={location} className="inline-flex items-center gap-1">
-              <MapPin className="size-4 text-[#6d28d9]" />
-              {location}
-            </span>
-          ))}
-          {calendarEvent.references.map((reference) => (
-            <a key={reference} href={reference} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold text-[#6d28d9] underline-offset-4 hover:underline dark:text-[#e879f9]">
-              Reference
-              <ExternalLink className="size-4" />
-            </a>
-          ))}
-        </div>
+        ))}
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-7">
+        {days.map((day) => {
+          const dayEvents = events.filter((event) => isSameCalendarDay(event.startDate, day));
+          const inMonth = day.getMonth() === anchorDate.getMonth();
+
+          return (
+            <div
+              key={day.toISOString()}
+              className={cn(
+                'min-h-32 border-b border-r border-[#d9c7e7] p-3 last:border-r-0 dark:border-[#6d28d9]/60 sm:last:border-r',
+                !inMonth && 'bg-[#f7f2ff]/60 text-[#7b638b] dark:bg-[#151019]/50 dark:text-[#8f78a0]',
+              )}
+            >
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className={cn('font-mono text-sm font-bold', inMonth ? 'text-[#241232] dark:text-[#fffdf7]' : 'text-[#7b638b] dark:text-[#8f78a0]')}>
+                  {day.getDate()}
+                </span>
+                {dayEvents.length > 0 ? <span className="size-2 rounded-full bg-[#17a673]" /> : null}
+              </div>
+              <div className="grid gap-2">
+                {dayEvents.map((event) => (
+                  <CalendarEventChip key={event.id} calendarEvent={event} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CalendarEventChip({ calendarEvent }: { calendarEvent: CalendarEventView }) {
+  return (
+    <article className="border border-[#a855f7] bg-[#f7f2ff] p-2 text-left shadow-[2px_2px_0_#a855f7] dark:bg-[#151019]">
+      <h4 className="line-clamp-2 text-sm font-black leading-tight text-[#241232] dark:text-[#fffdf7]">{calendarEvent.title}</h4>
+      <p className="mt-1 text-xs font-semibold text-[#5f4a6f] dark:text-[#d8c4ea]">{calendarEvent.isAllDay ? 'All day' : calendarEvent.startLabel}</p>
+      {calendarEvent.locations[0] ? (
+        <p className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-xs text-[#5f4a6f] dark:text-[#d8c4ea]">
+          <MapPin className="size-3 shrink-0 text-[#6d28d9] dark:text-[#e879f9]" />
+          {calendarEvent.locations[0]}
+        </p>
+      ) : null}
+      {calendarEvent.references[0] ? (
+        <a href={calendarEvent.references[0]} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-[#6d28d9] underline-offset-4 hover:underline dark:text-[#e879f9]">
+          Details
+          <ExternalLink className="size-3" />
+        </a>
+      ) : null}
     </article>
   );
 }
 
-function DocCard({ title, text }: { title: string; text: string }) {
+function isSameCalendarDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
+function SocialCard({ title, text }: { title: string; text: string }) {
   return (
     <div className="border-2 border-[#241232] bg-[#f7f2ff] p-5 shadow-[5px_5px_0_#e879f9] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[5px_5px_0_#6d28d9]">
-      <FileText className="mb-5 size-6 text-[#6d28d9] dark:text-[#e879f9]" />
+      <Heart className="mb-5 size-6 text-[#6d28d9] dark:text-[#e879f9]" />
       <h3 className="font-mono text-sm font-black uppercase text-[#241232] dark:text-[#fffdf7]">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-[#5f4a6f] dark:text-[#d8c4ea]">{text}</p>
     </div>
