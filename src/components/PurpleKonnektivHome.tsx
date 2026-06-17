@@ -36,7 +36,7 @@ import {
 } from '@/lib/nostrContent';
 import { cn } from '@/lib/utils';
 
-const NOSTR_NPUB_PATTERN = /(?:nostr:)?(npub1[023456789acdefghjklmnpqrstuvwxyz]+)/g;
+const NOSTR_PROFILE_PATTERN = /(?:nostr:)?((?:npub|nprofile)1[023456789acdefghjklmnpqrstuvwxyz]+)/g;
 
 const tickerItems = [
   '#purplekonnektiv',
@@ -357,19 +357,19 @@ function FeedText({ content }: { content: string }) {
   return (
     <p className="whitespace-pre-wrap break-words text-base leading-7 text-[#241232] [overflow-wrap:anywhere] dark:text-[#fffdf7]">
       {segments.map((segment, index) => (
-        segment.type === 'npub'
-          ? <NpubMention key={`${segment.value}-${index}`} npub={segment.value} />
+        segment.type === 'profile'
+          ? <ProfileMention key={`${segment.value}-${index}`} identifier={segment.value} />
           : <span key={`${segment.value}-${index}`}>{segment.value}</span>
       ))}
     </p>
   );
 }
 
-function NpubMention({ npub }: { npub: string }) {
-  const pubkey = decodeNpub(npub);
+function ProfileMention({ identifier }: { identifier: string }) {
+  const pubkey = decodeProfileIdentifier(identifier);
   const author = useAuthor(pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
-  const label = metadata?.display_name ?? metadata?.name ?? (pubkey ? shortPubkey(pubkey) : npub);
+  const label = metadata?.display_name ?? metadata?.name ?? (pubkey ? shortPubkey(pubkey) : identifier);
 
   return (
     <span className="inline font-bold text-[#6d28d9] [overflow-wrap:anywhere] dark:text-[#e879f9]">
@@ -378,15 +378,15 @@ function NpubMention({ npub }: { npub: string }) {
   );
 }
 
-function splitNostrMentions(content: string): Array<{ type: 'text' | 'npub'; value: string }> {
-  const segments: Array<{ type: 'text' | 'npub'; value: string }> = [];
+function splitNostrMentions(content: string): Array<{ type: 'text' | 'profile'; value: string }> {
+  const segments: Array<{ type: 'text' | 'profile'; value: string }> = [];
   let lastIndex = 0;
   let lastMentionPubkey: string | undefined;
 
-  for (const match of content.matchAll(NOSTR_NPUB_PATTERN)) {
+  for (const match of content.matchAll(NOSTR_PROFILE_PATTERN)) {
     const matchIndex = match.index ?? 0;
     const textBetween = content.slice(lastIndex, matchIndex);
-    const pubkey = decodeNpub(match[1]);
+    const pubkey = decodeProfileIdentifier(match[1]);
 
     if (pubkey && pubkey === lastMentionPubkey && textBetween.trim() === '') {
       lastIndex = matchIndex + match[0].length;
@@ -397,7 +397,7 @@ function splitNostrMentions(content: string): Array<{ type: 'text' | 'npub'; val
       segments.push({ type: 'text', value: textBetween });
     }
 
-    segments.push({ type: 'npub', value: match[1] });
+    segments.push({ type: 'profile', value: match[1] });
     lastMentionPubkey = pubkey;
     lastIndex = matchIndex + match[0].length;
   }
@@ -409,10 +409,12 @@ function splitNostrMentions(content: string): Array<{ type: 'text' | 'npub'; val
   return segments;
 }
 
-function decodeNpub(npub: string): string | undefined {
+function decodeProfileIdentifier(identifier: string): string | undefined {
   try {
-    const decoded = nip19.decode(npub);
-    return decoded.type === 'npub' ? decoded.data : undefined;
+    const decoded = nip19.decode(identifier);
+    if (decoded.type === 'npub') return decoded.data;
+    if (decoded.type === 'nprofile') return decoded.data.pubkey;
+    return undefined;
   } catch {
     return undefined;
   }
