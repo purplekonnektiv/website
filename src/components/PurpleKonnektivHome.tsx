@@ -37,10 +37,10 @@ import { cn } from '@/lib/utils';
 
 const tickerItems = [
   '#purplekonnektiv',
-  'Community notes',
+  'Meetup notes',
   'Meetups and calls',
   'Decentralized social media',
-  'Photos from the collective',
+  'Gathering photos',
   'Open conversations',
   'People over platforms',
 ];
@@ -111,7 +111,7 @@ export function PurpleKonnektivHome() {
                 <Sparkles className="size-5 text-[#17a673]" />
               </div>
               <div className="grid gap-4">
-                <SocialNote title="Posts from the community" text="Thoughts, images, questions, and moments shared with the PurpleKonnektiv tag." />
+                <SocialNote title="Meetup stories" text="Notes, photos, and reflections from PurpleKonnektiv gatherings and calls." />
                 <SocialNote title="Gatherings in one place" text="Upcoming meetups, calls, workshops, and local hangouts collected into a shared calendar." />
                 <Button asChild variant="outline" className="mt-2 rounded-[4px] border-2 border-[#241232] !bg-[#fffdf7] !text-[#241232] shadow-[4px_4px_0_#a855f7] dark:!border-[#e879f9] dark:!bg-[#151019] dark:!text-[#fffdf7]">
                   <Link to="/relays">
@@ -137,9 +137,9 @@ export function PurpleKonnektivHome() {
                 PurpleKonnektiv is a collective space for decentralization-minded people to meet, publish, coordinate, and keep in touch. The website is a window into the community, not the owner of it.
               </p>
               <div className="grid gap-4 sm:grid-cols-3">
-                <MissionCard icon={Users} title="Collective" text="Built around people, meetups, posts, and shared learning." />
-                <MissionCard icon={MessageCircle} title="Social" text="A shared stream for notes, images, questions, and conversations." />
-                <MissionCard icon={Sparkles} title="Open" text="Use #purplekonnektiv from your favorite app to join the stream." />
+                <MissionCard icon={Users} title="Collective" text="Built around people, meetups, gatherings, and shared learning." />
+                <MissionCard icon={MessageCircle} title="Social" text="A shared stream for meetup recaps, event notes, and community context." />
+                <MissionCard icon={Sparkles} title="Open" text="Use #purplekonnektiv for PurpleKonnektiv meetups, events, and follow-up notes." />
               </div>
             </div>
           </div>
@@ -149,7 +149,7 @@ export function PurpleKonnektivHome() {
           <SectionHeader
             eyebrow="Live feed"
             title="Posts tagged #purplekonnektiv"
-            description="Recent notes and images from people around the PurpleKonnektiv community."
+            description="Meetup notes, gathering photos, event recaps, and community context from PurpleKonnektiv."
             inverted
           />
           <div className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
@@ -158,7 +158,7 @@ export function PurpleKonnektivHome() {
             ) : feed.isError ? (
               <StateCard title="The feed is quiet right now" text="Try refreshing, or check your connections if the stream stays empty." inverted />
             ) : feedEvents.length === 0 ? (
-              <StateCard title="No posts yet" text="Share something with #purplekonnektiv and it can appear here." inverted />
+              <StateCard title="No meetup notes yet" text="Posts connected to PurpleKonnektiv meetups and events will appear here." inverted />
             ) : (
               <div className="grid gap-5 lg:grid-cols-3">
                 {feedEvents.map((event) => (
@@ -192,12 +192,12 @@ export function PurpleKonnektivHome() {
           <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Join in</p>
-              <h2 className="mt-3 text-4xl font-black leading-none text-[#241232] dark:text-[#fffdf7] sm:text-5xl">Bring your people, posts, and plans.</h2>
+              <h2 className="mt-3 text-4xl font-black leading-none text-[#241232] dark:text-[#fffdf7] sm:text-5xl">Bring your people and plans.</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              <SocialCard title="Say hello" text="Post a note with #purplekonnektiv and introduce what you are curious about." />
-              <SocialCard title="Share moments" text="Photos, sketches, links, and reflections help the collective feel alive." />
-              <SocialCard title="Host something" text="Add your meetup, call, or workshop so people know where to show up." />
+              <SocialCard title="Host something" text="Create a meetup, call, or workshop so people know where to show up." />
+              <SocialCard title="Share the recap" text="After a gathering, use #purplekonnektiv for notes, photos, links, and takeaways." />
+              <SocialCard title="Keep it contextual" text="Reserve the tag for PurpleKonnektiv events, coordination, and community follow-up." />
             </div>
           </div>
         </section>
@@ -206,7 +206,7 @@ export function PurpleKonnektivHome() {
       <footer className="border-t-2 border-[#241232] bg-[#241232] px-5 py-8 text-[#fffdf7] dark:border-[#a855f7] dark:bg-[#0f0a14] sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p className="font-mono font-bold">PurpleKonnektiv</p>
-          <p className="text-[#d8c4ea]">A shared social stream for #purplekonnektiv.</p>
+          <p className="text-[#d8c4ea]">A shared stream for PurpleKonnektiv meetups and community follow-up.</p>
         </div>
       </footer>
     </div>
