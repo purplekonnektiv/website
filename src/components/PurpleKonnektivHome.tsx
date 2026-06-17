@@ -318,9 +318,9 @@ export function FeedCard({ event }: { event: NostrEvent }) {
   const text = event.kind === 1 ? stripImageUrls(event.content) : event.content.trim();
 
   return (
-    <Card className="gap-0 rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[6px_6px_0_#6d28d9] motion-safe:hover:-translate-y-1">
-      <CardHeader className="gap-0 border-b-2 border-[#241232] p-4 dark:border-[#a855f7]">
-        <div className="flex items-center gap-3">
+    <Card className="min-w-0 max-w-full gap-0 overflow-hidden rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[6px_6px_0_#6d28d9] motion-safe:hover:-translate-y-1">
+      <CardHeader className="min-w-0 gap-0 border-b-2 border-[#241232] p-4 dark:border-[#a855f7]">
+        <div className="flex min-w-0 items-center gap-3">
           <Avatar className="border-2 border-[#241232]">
             {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
             <AvatarFallback className="bg-[#f7f2ff] font-mono text-xs font-bold text-[#6d28d9]">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
@@ -329,15 +329,15 @@ export function FeedCard({ event }: { event: NostrEvent }) {
             <CardTitle className="truncate text-base text-[#241232] dark:text-[#fffdf7]">{displayName}</CardTitle>
             <p className="font-mono text-xs text-[#7b638b] dark:text-[#d8c4ea]">{formatRelativeTime(event.created_at)}</p>
           </div>
-          <Badge className="ml-auto rounded-[4px] bg-[#241232] font-mono text-[#fffdf7]">post</Badge>
+          <Badge className="ml-auto shrink-0 rounded-[4px] bg-[#241232] font-mono text-[#fffdf7]">post</Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4 p-4">
+      <CardContent className="min-w-0 space-y-4 p-4">
         {text ? <FeedText content={text} /> : null}
         {imageUrls.length > 0 ? (
-          <div className="grid gap-2">
+          <div className="grid min-w-0 gap-2">
             {imageUrls.map((url) => (
-              <img key={url} src={url} alt="" loading="lazy" className="aspect-[4/3] w-full border-2 border-[#241232] object-cover" />
+              <img key={url} src={url} alt="" loading="lazy" className="aspect-[4/3] w-full min-w-0 border-2 border-[#241232] object-cover" />
             ))}
           </div>
         ) : event.kind === 20 ? (

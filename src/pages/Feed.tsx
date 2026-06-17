@@ -42,7 +42,7 @@ export default function Feed() {
           <StateCard title="No meetup notes yet" text="Posts connected to PurpleKonnektiv meetups and events will appear here." inverted />
         ) : (
           <>
-            <div className="grid gap-5 lg:grid-cols-3">
+            <div className="grid min-w-0 gap-5 lg:grid-cols-3">
               {events.map((event) => (
                 <FeedCard key={event.id} event={event} />
               ))}
