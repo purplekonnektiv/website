@@ -90,13 +90,13 @@ export function PurpleKonnektivHome() {
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Button asChild className="h-12 rounded-[4px] border-2 border-[#241232] bg-[#6d28d9] px-6 text-base font-bold text-white shadow-[4px_4px_0_#241232] hover:bg-[#5b21b6]">
+                <Button asChild className="h-12 rounded-[4px] border-2 border-[#241232] !bg-[#6d28d9] px-6 text-base font-bold !text-white shadow-[4px_4px_0_#241232] hover:!bg-[#5b21b6] dark:!border-[#e879f9] dark:shadow-[4px_4px_0_#e879f9]">
                   <a href="#feed">
                     Explore the feed
                     <ArrowRight className="ml-2 size-4" />
                   </a>
                 </Button>
-                <Button asChild variant="outline" className="h-12 rounded-[4px] border-2 border-[#241232] bg-[#fffdf7] px-6 text-base font-bold text-[#241232] shadow-[4px_4px_0_#a855f7] hover:bg-[#f4e8ff]">
+                <Button asChild variant="outline" className="h-12 rounded-[4px] border-2 border-[#241232] !bg-[#fffdf7] px-6 text-base font-bold !text-[#241232] shadow-[4px_4px_0_#a855f7] hover:!bg-[#f4e8ff] dark:!border-[#e879f9] dark:!bg-[#241232] dark:!text-[#fffdf7] dark:shadow-[4px_4px_0_#6d28d9] dark:hover:!bg-[#30183f]">
                   <a href="#calendar">
                     View calendar
                     <CalendarDays className="ml-2 size-4" />
@@ -105,9 +105,9 @@ export function PurpleKonnektivHome() {
               </div>
             </div>
 
-            <aside className="self-end border-2 border-[#241232] bg-[#fffdf7] p-5 shadow-[8px_8px_0_#6d28d9]">
-              <div className="mb-5 flex items-center justify-between gap-3 border-b-2 border-[#241232] pb-3">
-                <p className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Protocol board</p>
+            <aside className="self-end border-2 border-[#241232] bg-[#fffdf7] p-5 shadow-[8px_8px_0_#6d28d9] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[8px_8px_0_#6d28d9]">
+              <div className="mb-5 flex items-center justify-between gap-3 border-b-2 border-[#241232] pb-3 dark:border-[#a855f7]">
+                <p className="font-mono text-sm font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">Protocol board</p>
                 <Wifi className="size-5 text-[#17a673]" />
               </div>
               <div className="grid gap-3 font-mono text-sm">
@@ -189,11 +189,11 @@ export function PurpleKonnektivHome() {
                   <h3 className="font-mono text-sm font-bold uppercase text-[#6d28d9]">Past signal</h3>
                   <div className="mt-5 grid gap-4">
                     {pastEvents.length === 0 ? (
-                      <p className="text-sm leading-6 text-[#5f4a6f]">Past events will collect here once the calendar has history.</p>
+                      <p className="text-sm leading-6 text-[#5f4a6f] dark:text-[#d8c4ea]">Past events will collect here once the calendar has history.</p>
                     ) : pastEvents.map((event) => (
                       <div key={event.id} className="border-l-4 border-[#a855f7] pl-3">
-                        <p className="text-sm font-bold text-[#241232]">{event.title}</p>
-                        <p className="mt-1 text-xs text-[#5f4a6f]">{event.startLabel}</p>
+                        <p className="text-sm font-bold text-[#241232] dark:text-[#fffdf7]">{event.title}</p>
+                        <p className="mt-1 text-xs text-[#5f4a6f] dark:text-[#d8c4ea]">{event.startLabel}</p>
                       </div>
                     ))}
                   </div>
@@ -291,19 +291,19 @@ function Ticker() {
 
 function SignalRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-[#d9c7e7] pb-2 last:border-b-0">
-      <span className="text-[#7b638b]">{label}</span>
-      <span className="min-w-0 break-words text-right font-bold text-[#241232]">{value}</span>
+    <div className="flex items-start justify-between gap-4 border-b border-[#d9c7e7] pb-2 last:border-b-0 dark:border-[#6d28d9]">
+      <span className="text-[#7b638b] dark:text-[#d8c4ea]">{label}</span>
+      <span className="min-w-0 break-words text-right font-bold text-[#241232] dark:text-[#fffdf7]">{value}</span>
     </div>
   );
 }
 
 function MissionCard({ icon: Icon, title, text }: { icon: typeof Users; title: string; text: string }) {
   return (
-    <div className="border-2 border-[#241232] bg-[#f7f2ff] p-4 shadow-[4px_4px_0_#a855f7]">
-      <Icon className="mb-4 size-6 text-[#6d28d9]" />
-      <h3 className="font-mono text-sm font-black uppercase text-[#241232]">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[#5f4a6f]">{text}</p>
+    <div className="border-2 border-[#241232] bg-[#f7f2ff] p-4 shadow-[4px_4px_0_#a855f7] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[4px_4px_0_#6d28d9]">
+      <Icon className="mb-4 size-6 text-[#6d28d9] dark:text-[#e879f9]" />
+      <h3 className="font-mono text-sm font-black uppercase text-[#241232] dark:text-[#fffdf7]">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-[#5f4a6f] dark:text-[#d8c4ea]">{text}</p>
     </div>
   );
 }
@@ -311,10 +311,10 @@ function MissionCard({ icon: Icon, title, text }: { icon: typeof Users; title: s
 function SectionHeader({ eyebrow, title, description, inverted = false }: { eyebrow: string; title: string; description: string; inverted?: boolean }) {
   return (
     <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
-      <p className={cn('font-mono text-sm font-bold uppercase', inverted ? 'text-[#e879f9]' : 'text-[#6d28d9]')}>{eyebrow}</p>
+      <p className={cn('font-mono text-sm font-bold uppercase', inverted ? 'text-[#e879f9]' : 'text-[#6d28d9] dark:text-[#e879f9]')}>{eyebrow}</p>
       <div className="mt-3 grid gap-4 lg:grid-cols-[0.75fr_1fr] lg:items-end">
-        <h2 className={cn('text-4xl font-black leading-none sm:text-6xl', inverted ? 'text-[#fffdf7]' : 'text-[#241232]')}>{title}</h2>
-        <p className={cn('max-w-2xl text-lg leading-8', inverted ? 'text-[#d8c4ea]' : 'text-[#5f4a6f]')}>{description}</p>
+        <h2 className={cn('text-4xl font-black leading-none sm:text-6xl', inverted ? 'text-[#fffdf7]' : 'text-[#241232] dark:text-[#fffdf7]')}>{title}</h2>
+        <p className={cn('max-w-2xl text-lg leading-8', inverted ? 'text-[#d8c4ea]' : 'text-[#5f4a6f] dark:text-[#d8c4ea]')}>{description}</p>
       </div>
     </div>
   );
@@ -329,22 +329,22 @@ function FeedCard({ event }: { event: NostrEvent }) {
   const text = event.kind === 1 ? stripImageUrls(event.content) : event.content.trim();
 
   return (
-    <Card className="gap-0 rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform motion-safe:hover:-translate-y-1">
-      <CardHeader className="gap-0 border-b-2 border-[#241232] p-4">
+    <Card className="gap-0 rounded-[4px] border-2 border-[#fffdf7] bg-[#fffdf7] py-0 text-[#151019] shadow-[6px_6px_0_#a855f7] transition-transform dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7] dark:shadow-[6px_6px_0_#6d28d9] motion-safe:hover:-translate-y-1">
+      <CardHeader className="gap-0 border-b-2 border-[#241232] p-4 dark:border-[#a855f7]">
         <div className="flex items-center gap-3">
           <Avatar className="border-2 border-[#241232]">
             {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
             <AvatarFallback className="bg-[#f7f2ff] font-mono text-xs font-bold text-[#6d28d9]">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <CardTitle className="truncate text-base text-[#241232]">{displayName}</CardTitle>
-            <p className="font-mono text-xs text-[#7b638b]">{formatRelativeTime(event.created_at)}</p>
+            <CardTitle className="truncate text-base text-[#241232] dark:text-[#fffdf7]">{displayName}</CardTitle>
+            <p className="font-mono text-xs text-[#7b638b] dark:text-[#d8c4ea]">{formatRelativeTime(event.created_at)}</p>
           </div>
           <Badge className="ml-auto rounded-[4px] bg-[#241232] font-mono text-[#fffdf7]">kind {event.kind}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4 p-4">
-        {text ? <p className="whitespace-pre-wrap text-base leading-7 text-[#241232]">{text}</p> : null}
+        {text ? <p className="whitespace-pre-wrap text-base leading-7 text-[#241232] dark:text-[#fffdf7]">{text}</p> : null}
         {imageUrls.length > 0 ? (
           <div className="grid gap-2">
             {imageUrls.map((url) => (
@@ -352,11 +352,11 @@ function FeedCard({ event }: { event: NostrEvent }) {
             ))}
           </div>
         ) : event.kind === 20 ? (
-          <div className="flex aspect-[4/3] items-center justify-center border-2 border-dashed border-[#a855f7] bg-[#f7f2ff] text-[#6d28d9]">
+          <div className="flex aspect-[4/3] items-center justify-center border-2 border-dashed border-[#a855f7] bg-[#f7f2ff] text-[#6d28d9] dark:bg-[#1c1027] dark:text-[#e879f9]">
             <ImageIcon className="size-8" />
           </div>
         ) : null}
-        <p className="font-mono text-xs font-bold uppercase text-[#6d28d9]">#purplekonnektiv</p>
+        <p className="font-mono text-xs font-bold uppercase text-[#6d28d9] dark:text-[#e879f9]">#purplekonnektiv</p>
       </CardContent>
     </Card>
   );
@@ -364,8 +364,8 @@ function FeedCard({ event }: { event: NostrEvent }) {
 
 function CalendarCard({ calendarEvent }: { calendarEvent: CalendarEventView }) {
   return (
-    <article className={cn('grid gap-0 border-2 border-[#241232] bg-[#fffdf7] shadow-[6px_6px_0_#6d28d9] md:grid-cols-[10rem_1fr]', calendarEvent.isPast && 'opacity-75')}>
-      <div className="border-b-2 border-[#241232] bg-[#6d28d9] p-5 text-[#fffdf7] md:border-b-0 md:border-r-2">
+    <article className={cn('grid gap-0 border-2 border-[#241232] bg-[#fffdf7] shadow-[6px_6px_0_#6d28d9] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[6px_6px_0_#6d28d9] md:grid-cols-[10rem_1fr]', calendarEvent.isPast && 'opacity-75')}>
+      <div className="border-b-2 border-[#241232] bg-[#6d28d9] p-5 text-[#fffdf7] dark:border-[#a855f7] md:border-b-0 md:border-r-2">
         <p className="font-mono text-xs font-bold uppercase">{calendarEvent.isAllDay ? 'All day' : 'Timed'}</p>
         <p className="mt-4 text-2xl font-black leading-tight">{calendarEvent.startDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</p>
         <p className="mt-1 font-mono text-xs">{calendarEvent.startDate.getUTCFullYear()}</p>
@@ -373,8 +373,8 @@ function CalendarCard({ calendarEvent }: { calendarEvent: CalendarEventView }) {
       <div className="grid gap-4 p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="text-2xl font-black leading-tight text-[#241232]">{calendarEvent.title}</h3>
-            <p className="mt-2 text-sm font-semibold text-[#5f4a6f]">
+            <h3 className="text-2xl font-black leading-tight text-[#241232] dark:text-[#fffdf7]">{calendarEvent.title}</h3>
+            <p className="mt-2 text-sm font-semibold text-[#5f4a6f] dark:text-[#d8c4ea]">
               {calendarEvent.startLabel}
               {calendarEvent.endLabel ? ` - ${calendarEvent.endLabel}` : ''}
               {calendarEvent.timezone ? ` (${calendarEvent.timezone})` : ''}
@@ -384,9 +384,9 @@ function CalendarCard({ calendarEvent }: { calendarEvent: CalendarEventView }) {
             {calendarEvent.isPast ? 'past' : 'upcoming'}
           </Badge>
         </div>
-        {calendarEvent.summary ? <p className="text-base leading-7 text-[#3b234f]">{calendarEvent.summary}</p> : null}
+        {calendarEvent.summary ? <p className="text-base leading-7 text-[#3b234f] dark:text-[#f1e7fb]">{calendarEvent.summary}</p> : null}
         {calendarEvent.imageUrl ? <img src={calendarEvent.imageUrl} alt="" loading="lazy" className="aspect-[16/9] w-full border-2 border-[#241232] object-cover" /> : null}
-        <div className="flex flex-wrap gap-3 text-sm text-[#5f4a6f]">
+        <div className="flex flex-wrap gap-3 text-sm text-[#5f4a6f] dark:text-[#d8c4ea]">
           {calendarEvent.locations.map((location) => (
             <span key={location} className="inline-flex items-center gap-1">
               <MapPin className="size-4 text-[#6d28d9]" />
@@ -394,7 +394,7 @@ function CalendarCard({ calendarEvent }: { calendarEvent: CalendarEventView }) {
             </span>
           ))}
           {calendarEvent.references.map((reference) => (
-            <a key={reference} href={reference} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold text-[#6d28d9] underline-offset-4 hover:underline">
+            <a key={reference} href={reference} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold text-[#6d28d9] underline-offset-4 hover:underline dark:text-[#e879f9]">
               Reference
               <ExternalLink className="size-4" />
             </a>
@@ -407,19 +407,19 @@ function CalendarCard({ calendarEvent }: { calendarEvent: CalendarEventView }) {
 
 function DocCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="border-2 border-[#241232] bg-[#f7f2ff] p-5 shadow-[5px_5px_0_#e879f9]">
-      <FileText className="mb-5 size-6 text-[#6d28d9]" />
-      <h3 className="font-mono text-sm font-black uppercase text-[#241232]">{title}</h3>
-      <p className="mt-3 text-sm leading-6 text-[#5f4a6f]">{text}</p>
+    <div className="border-2 border-[#241232] bg-[#f7f2ff] p-5 shadow-[5px_5px_0_#e879f9] dark:border-[#a855f7] dark:bg-[#241232] dark:shadow-[5px_5px_0_#6d28d9]">
+      <FileText className="mb-5 size-6 text-[#6d28d9] dark:text-[#e879f9]" />
+      <h3 className="font-mono text-sm font-black uppercase text-[#241232] dark:text-[#fffdf7]">{title}</h3>
+      <p className="mt-3 text-sm leading-6 text-[#5f4a6f] dark:text-[#d8c4ea]">{text}</p>
     </div>
   );
 }
 
 function StateCard({ title, text, inverted = false }: { title: string; text: string; inverted?: boolean }) {
   return (
-    <div className={cn('border-2 border-dashed p-8 text-center', inverted ? 'border-[#fffdf7] text-[#fffdf7]' : 'border-[#241232] bg-[#fffdf7] text-[#241232]')}>
+    <div className={cn('border-2 border-dashed p-8 text-center', inverted ? 'border-[#fffdf7] text-[#fffdf7]' : 'border-[#241232] bg-[#fffdf7] text-[#241232] dark:border-[#a855f7] dark:bg-[#241232] dark:text-[#fffdf7]')}>
       <p className="text-xl font-black">{title}</p>
-      <p className={cn('mx-auto mt-2 max-w-md leading-7', inverted ? 'text-[#d8c4ea]' : 'text-[#5f4a6f]')}>{text}</p>
+      <p className={cn('mx-auto mt-2 max-w-md leading-7', inverted ? 'text-[#d8c4ea]' : 'text-[#5f4a6f] dark:text-[#d8c4ea]')}>{text}</p>
     </div>
   );
 }
@@ -428,7 +428,7 @@ function FeedSkeleton() {
   return (
     <div className="grid gap-5 lg:grid-cols-3">
       {Array.from({ length: 6 }, (_, index) => (
-        <div key={index} className="border-2 border-[#fffdf7] bg-[#fffdf7] p-4">
+        <div key={index} className="border-2 border-[#fffdf7] bg-[#fffdf7] p-4 dark:border-[#a855f7] dark:bg-[#241232]">
           <div className="flex items-center gap-3">
             <Skeleton className="size-10 rounded-full bg-[#d8c4ea]" />
             <div className="grid flex-1 gap-2">
@@ -447,7 +447,7 @@ function CalendarSkeleton() {
   return (
     <div className="grid gap-5 lg:col-span-2">
       {Array.from({ length: 3 }, (_, index) => (
-        <div key={index} className="grid gap-0 border-2 border-[#241232] bg-[#fffdf7] md:grid-cols-[10rem_1fr]">
+        <div key={index} className="grid gap-0 border-2 border-[#241232] bg-[#fffdf7] dark:border-[#a855f7] dark:bg-[#241232] md:grid-cols-[10rem_1fr]">
           <Skeleton className="h-32 rounded-none bg-[#d8c4ea]" />
           <div className="space-y-4 p-5">
             <Skeleton className="h-6 w-2/3 bg-[#d8c4ea]" />
